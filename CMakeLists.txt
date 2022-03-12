@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
+set(CMAKE_CXX_COMPILER "g++-11")
 
 #Set up project
 project(PetrinetSE
@@ -20,6 +21,7 @@ set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+
 if(ENABLE_PROF)
 message("Generating profiling output...")
 set(TRACY_PATH "./lib/tracy")
@@ -31,4 +33,10 @@ target_link_libraries(${PROJECT_NAME} PUBLIC tracy)
 target_link_libraries(${PROJECT_NAME} PUBLIC ${CMAKE_DL_LIBS})
 message("Profiling done. You should start tracy sever now")
 endif()
+
 target_link_libraries(${PROJECT_NAME} PUBLIC tbb)
+
+enable_testing()
+add_subdirectory(src bin)
+add_subdirectory(test)
+
