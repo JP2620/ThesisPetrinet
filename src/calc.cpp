@@ -6,5 +6,5 @@ int Calc::Sum(int a, int b)
 
 int Calc::Multiply(int a, int b)
 {
-  return a * a; // a mistake!
+  return a * b; // a mistake!
 }
