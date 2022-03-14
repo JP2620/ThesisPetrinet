@@ -20,6 +20,6 @@ TEST_F(CalcTestSuite, MultiplyMultipliesTwoInts)
 
 TEST_F(CalcTestSuite, ValidateFilename)
 {
-  std::string filename = "test/calc_test.cpp";
+  std::string filename = "archivo.json";
   EXPECT_EQ(true, engine.validateFilename(filename));
 }

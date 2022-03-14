@@ -37,6 +37,6 @@ endif()
 target_link_libraries(${PROJECT_NAME} PUBLIC tbb)
 
 enable_testing()
-add_subdirectory(src bin)
+add_subdirectory(src)
 add_subdirectory(test)
 
