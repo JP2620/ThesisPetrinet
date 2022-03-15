@@ -10,7 +10,7 @@ GIT_TAG main
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 add_executable(unit_tests
-calc_test.cpp
+TestReadJSON.cpp
 ../src/AgentFactory.cpp
 ../src/AgentImmediate.cpp
 ../src/AlgorithmMinCov.cpp
