@@ -12,7 +12,7 @@ void AlgorithmMinCov::runAlgorithm(std::shared_ptr<PetriNetwork> petri_instance)
     std::cout << "Take " << time.count() << " us\n";
     std::cout << "File output: mincov_out.json\n";
     std::cout << "\n\n";
-    OutputParser::MinCovOut(processed_set.get(),time.count(),petrinet.get());
+    OutputParser::MinCovOut(processed_set.get(), time.count(), petrinet.get());
     exit(0);
 }
 
@@ -69,32 +69,35 @@ void AlgorithmMinCov::runMinCov()
         current_node = potential_node.parent_node;
 
         // Take one node, the parent node only if an active node...
-        if (current_node->isActive()){
-            //Generate the mark from the node...
+        if (current_node->isActive())
+        {
+            // Generate the mark from the node...
             auto new_mark = std::make_unique<std::vector<uint32_t>>(petrinet->getPlaces());
             transitions->at(potential_node.transition)->fireFromMark(current_node->getMarkAssociate(), new_mark.get());
 
-            //Remove candidate node from unprocessed_set...
+            // Remove candidate node from unprocessed_set...
             unprocessed_set->pop_front();
 
-            if(filter_set->contains(generateHash(new_mark.get()))){
+            if (filter_set->contains(generateHash(new_mark.get())))
+            {
                 continue;
             }
 
             // Step 1) Verify if the node is currently dominated...
-            if(!isDominatedNode(new_mark.get(),root_node.get())){
-                //if not dominated...
+            if (!isDominatedNode(new_mark.get(), root_node.get()))
+            {
+                // if not dominated...
 
                 // Step 2) Accelerate node
-                accelerate(potential_node,new_mark.get());
+                accelerate(potential_node, new_mark.get());
 
                 amount_accelerated_nodes++;
 
-                auto child = std::make_shared<NodeState>(potential_node.transition,current_node,current_node->getDeep()+1);
+                auto child = std::make_shared<NodeState>(potential_node.transition, current_node, current_node->getDeep() + 1);
 
                 child->setMark(std::move(new_mark));
 
-                processed_set->insert_or_assign(generateHash(child->getMarkAssociate()),child);
+                processed_set->insert_or_assign(generateHash(child->getMarkAssociate()), child);
 
                 child->setNodeId(processed_set->size());
 
@@ -114,13 +117,13 @@ void AlgorithmMinCov::runMinCov()
 
                 updateFrontSet();
             }
-        } else {
+        }
+        else
+        {
             unprocessed_set->pop_front();
         }
-        
     }
 }
-
 
 void AlgorithmMinCov::updateFrontSet()
 {
@@ -128,71 +131,89 @@ void AlgorithmMinCov::updateFrontSet()
     {
         if (transitions->at(t)->isSensitizedMark(current_node->getMarkAssociate()))
         {
-            unprocessed_set->emplace_back(PotentialNode_t{current_node,t});
+            unprocessed_set->emplace_back(PotentialNode_t{current_node, t});
         }
     }
 }
 
-bool AlgorithmMinCov::isDominatedNode(std::vector<uint32_t>* mark,NodeState* currt_node)
+bool AlgorithmMinCov::isDominatedNode(std::vector<uint32_t> *mark, NodeState *currt_node)
 {
-    if(currt_node->isActive()){
-        if(hasSmallerMark(mark,currt_node->getMarkAssociate())){
+    if (currt_node->isActive())
+    {
+        if (hasSmallerMark(mark, currt_node->getMarkAssociate()))
+        {
             return true;
         }
     }
 
-    for(const auto& child : *currt_node->getChildren()){
-        if(isDominatedNode(mark,child.get())){
+    for (const auto &child : *currt_node->getChildren())
+    {
+        if (isDominatedNode(mark, child.get()))
+        {
             return true;
         }
     }
 
     return false;
-
 }
 
-void AlgorithmMinCov::accelerate(PotentialNode_t& candidate,std::vector<uint32_t>* mark){
+void AlgorithmMinCov::accelerate(PotentialNode_t &candidate, std::vector<uint32_t> *mark)
+{
     auto node = candidate.parent_node;
-    while(node != nullptr){
-        if(node->isActive() && (hasSmallerMark(node->getMarkAssociate(),mark))){
-            generateOmegaMarking(mark,candidate);
+    while (node != nullptr)
+    {
+        if (node->isActive() && (hasSmallerMark(node->getMarkAssociate(), mark)))
+        {
+            generateOmegaMarking(mark, candidate);
         }
         node = node->getParentNode();
     }
 }
 
-void AlgorithmMinCov::generateOmegaMarking(std::vector<uint32_t>* mark, PotentialNode_t& candidate){
-    for(size_t p = 0; p < petrinet->getPlaces();p++){
-        if(petrinet->getRow(candidate.transition)[p]>petrinet->getRowPre(candidate.transition)[p]){
+void AlgorithmMinCov::generateOmegaMarking(std::vector<uint32_t> *mark, PotentialNode_t &candidate)
+{
+    for (size_t p = 0; p < petrinet->getPlaces(); p++)
+    {
+        if (petrinet->getRow(candidate.transition)[p] > petrinet->getRowPre(candidate.transition)[p])
+        {
             mark->at(p) = OMEGA;
         }
-        else if(petrinet->getRow(candidate.transition)[p] == 0){
+        else if (petrinet->getRow(candidate.transition)[p] == 0)
+        {
             continue;
         }
-        else if(petrinet->getRow(candidate.transition)[p]== 1 && isGrowingUp(mark->at(p),p,candidate)){
+        else if (petrinet->getRow(candidate.transition)[p] == 1 && isGrowingUp(mark->at(p), p, candidate))
+        {
             mark->at(p) = OMEGA;
         }
     }
 }
 
-bool AlgorithmMinCov::isGrowingUp(uint32_t mark_tokens,uint32_t place,PotentialNode_t& candidate){
+bool AlgorithmMinCov::isGrowingUp(uint32_t mark_tokens, uint32_t place, PotentialNode_t &candidate)
+{
     auto parent = candidate.parent_node;
     bool alwaysSensitized = true;
     bool growUp = mark_tokens > 0;
-    while(parent != nullptr){
+    while (parent != nullptr)
+    {
         alwaysSensitized &= parent->isSensitizedAt(candidate.transition);
         growUp &= parent->getMarkAssociate()->at(place);
     }
     return growUp && alwaysSensitized;
 }
 
-std::string AlgorithmMinCov::generateHash(std::vector<uint32_t>* marking){
+std::string AlgorithmMinCov::generateHash(std::vector<uint32_t> *marking)
+{
     std::stringstream str_builder;
     str_builder << "[";
-    for (auto m : *marking) {
-        if (m == OMEGA){
+    for (auto m : *marking)
+    {
+        if (m == OMEGA)
+        {
             str_builder << "W ";
-        } else {
+        }
+        else
+        {
             str_builder << m << " ";
         }
     }
@@ -201,7 +222,7 @@ std::string AlgorithmMinCov::generateHash(std::vector<uint32_t>* marking){
     return aux_hash_maker.final();
 }
 
-bool AlgorithmMinCov::hasSmallerMark(std::vector<uint32_t>* lhs_node, std::vector<uint32_t>* rhs_node)
+bool AlgorithmMinCov::hasSmallerMark(std::vector<uint32_t> *lhs_node, std::vector<uint32_t> *rhs_node)
 {
     auto aux_vector = std::make_unique<std::vector<uint8_t>>(petrinet->getPlaces());
     std::transform(std::execution::par, lhs_node->begin(), lhs_node->end(), rhs_node->begin(), aux_vector->begin(),

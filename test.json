@@ -3,15 +3,15 @@
     "id": "Producer-consumer",
     "amount_places": 9,
     "amount_transitions": 6,
-    "time_scale":"millisecond",
-    "is_temporal":true,
-    "network_type":"discrete"
+    "time_scale": "millisecond",
+    "is_temporal": true,
+    "network_type": "discrete"
   },
   "places": [
     {
       "index": 0,
       "type": "discrete",
-      "initial_marking": 2
+      "initial_marking": 1
     },
     {
       "index": 1,
@@ -26,7 +26,7 @@
     {
       "index": 3,
       "type": "discrete",
-      "initial_marking": 5
+      "initial_marking": 1
     },
     {
       "index": 4,
@@ -41,7 +41,7 @@
     {
       "index": 6,
       "type": "discrete",
-      "initial_marking": 3
+      "initial_marking": 1
     },
     {
       "index": 7,

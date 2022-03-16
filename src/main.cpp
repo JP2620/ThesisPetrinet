@@ -2,9 +2,7 @@
 #include "../include/Engine.hpp"
 #include "../lib/args.hxx"
 
-#define VERSION_NUMBER "1.1.0"  ///< Version number of the application
-
-
+#define VERSION_NUMBER "1.1.0" ///< Version number of the application
 
 int main(int argc, char **argv)
 {
@@ -46,24 +44,29 @@ int main(int argc, char **argv)
         return 0;
     }
 
-    if(filename){
+    if (filename)
+    {
         auto engine = std::make_unique<Engine>();
-        if(simulation){
-            std::cout<<"Starting simulation...\n";
-            engine->run(std::move(args::get(filename)),0);
-            
+        if (simulation)
+        {
+            std::cout << "Starting simulation...\n";
+            engine->run(std::move(args::get(filename)), 0);
         }
-        else if(algorithm){
-            std::cout<<"Starting algorithm...\n";
-            engine->run(std::move(args::get(filename)),1);
+        else if (algorithm)
+        {
+            std::cout << "Starting algorithm...\n";
+            engine->run(std::move(args::get(filename)), 1);
         }
-        else {
-            std::cout<<"Invalid option, plese, run with -h or --help to see the options\n";
+        else
+        {
+            std::cout << "Invalid option, plese, run with -h or --help to see the options\n";
             exit(0);
         }
-    }else {
-            std::cout<<"Missing file name, please use a JSON or PNML format\n";
-            exit(0);
-        }
-    std::cout<<"*** DONE ***\t Program ends successfully ! :)\n";
+    }
+    else
+    {
+        std::cout << "Missing file name, please use a JSON or PNML format\n";
+        exit(0);
+    }
+    std::cout << "*** DONE ***\t Program ends successfully ! :)\n";
 }
