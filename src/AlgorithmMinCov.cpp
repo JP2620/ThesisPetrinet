@@ -13,7 +13,6 @@ void AlgorithmMinCov::runAlgorithm(std::shared_ptr<PetriNetwork> petri_instance)
     std::cout << "File output: mincov_out.json\n";
     std::cout << "\n\n";
     OutputParser::MinCovOut(processed_set.get(), time.count(), petrinet.get());
-    exit(0);
 }
 
 void AlgorithmMinCov::runMinCov()
