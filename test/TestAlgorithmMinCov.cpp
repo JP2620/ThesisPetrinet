@@ -12,9 +12,9 @@ protected:
     AlgorithmMinCov sut_;
 };
 
-TEST_F(AlgorithmMinCovTestSuite, minCovTest)
+TEST_F(AlgorithmMinCovTestSuite, minCovTestProdCons)
 {
-    std::string input_filename = "../../test.json";
+    std::string input_filename = "../../test/petri_nets/prod_cons.json";
     std::string output_filename = "./mincov_out.json";
 
     // Validate input filename

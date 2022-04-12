@@ -10,7 +10,7 @@ protected:
 
 TEST_F(ReadJSONTestSuite, readFileTest)
 {
-  std::string filename = "../../test.json";
+  std::string filename = "../../test/petri_nets/prod_cons.json";
   EXPECT_EQ(1, sut_.readFile(filename));
 
   EXPECT_EQ(9, sut_.getNumberPlaces());
