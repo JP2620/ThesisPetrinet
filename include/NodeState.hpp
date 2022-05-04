@@ -144,7 +144,15 @@ class NodeState{
         }
     }
 
+ /**
+  * @brief Realiza la poda en el padre y caso contrario la verifica en los hijos.
+  *         EL padre va a apagar a los hijos cuando vuelva a entrar en pruneNode 
+  *
+  * @param rhs_node Vector de ¿marcado? del estado que se desea verificar
+  */
     void pruneNode(std::vector<uint32_t>* rhs_node){
+         // is_ancertor -> true antes de ejecutar la poda, false despues
+         // is_active es una variable que usa el padre para desactivar el hijo si no quiere seguir ese camino (?)
         if(((!is_ancestor) || is_active) && this->hasSmallerMark(network_mark.get(),rhs_node)){
             deactivateSubtree();
         } else {
@@ -154,13 +162,26 @@ class NodeState{
         }
     }
 
+
+    /**
+     * @brief Compara las marca
+     * 
+     * @param lhs_node posiblemente el marcado actual
+     * @param rhs_node posiblemente sea el marcado que inteta ver si es posible (futuro)
+     * @return true 
+     * @return false 
+     */
     bool hasSmallerMark(std::vector<uint32_t>* lhs_node, std::vector<uint32_t>* rhs_node){
     auto aux_vector = std::make_unique<std::vector<uint8_t>>(network_mark->size());
+    // Transform( principi_primer_elemento, fin_primer_elemento, principio_segundo_elemento, principio_salida)[](...){salida}
     std::transform(lhs_node->begin(), lhs_node->end(), rhs_node->begin(), aux_vector->begin(),
                    [](uint32_t lhs_value, uint32_t rhs_value)
                    {
                        return lhs_value <= rhs_value;
                    });
+    //All_off devuelve:
+        //- true si todo lo cumple
+        //-false si al menos 1 no lo cumple
     return std::all_of(aux_vector->begin(), aux_vector->end(), [](uint8_t result)
                        { return result != 0; });
     }
