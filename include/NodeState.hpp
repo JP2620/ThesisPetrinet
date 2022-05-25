@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <stack>
 
 class NodeState{
 	private:
@@ -151,15 +152,25 @@ class NodeState{
   * @param rhs_node Vector de ¿marcado? del estado que se desea verificar
   */
     void pruneNode(std::vector<uint32_t>* rhs_node){
-         // is_ancertor -> true antes de ejecutar la poda, false despues
-         // is_active es una variable que usa el padre para desactivar el hijo si no quiere seguir ese camino (?)
-        if(((!is_ancestor) || is_active) && this->hasSmallerMark(network_mark.get(),rhs_node)){
-            deactivateSubtree();
-        } else {
-            for(auto const& child : *children){
-                child->pruneNode(rhs_node);
+    /*
+     * is_ancertor -> true antes de ejecutar la poda, false despues
+     * is_active es una variable que usa el padre para desactivar el hijo si no quiere seguir ese camino (?)
+     * */
+
+     // TODO: liberar memoria si es que no se hace automáticamente
+     std::stack<NodeState*> stack;
+     stack.push(this);
+     while (!stack.empty()) {
+         NodeState* node = stack.top();
+         stack.pop();
+         if(((!node->is_ancestor) || node->is_active) && node->hasSmallerMark(this->network_mark.get(), rhs_node)){
+             node->deactivateSubtree();
+         } else {
+            for(auto const& child : *node->children) {
+                 stack.push(child.get());
             }
-        }
+         }
+     }
     }
 
 
