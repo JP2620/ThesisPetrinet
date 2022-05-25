@@ -185,16 +185,20 @@ class NodeState{
     bool hasSmallerMark(std::vector<uint32_t>* lhs_node, std::vector<uint32_t>* rhs_node){
     auto aux_vector = std::make_unique<std::vector<uint8_t>>(network_mark->size());
     // Transform( principi_primer_elemento, fin_primer_elemento, principio_segundo_elemento, principio_salida)[](...){salida}
+        std::cout << "-------------------------------------------" << std::endl;
     std::transform(lhs_node->begin(), lhs_node->end(), rhs_node->begin(), aux_vector->begin(),
                    [](uint32_t lhs_value, uint32_t rhs_value)
                    {
-                       return lhs_value <= rhs_value;
+                        std::cout << lhs_value << " - " << rhs_value << std::endl;
+                        return lhs_value <= rhs_value;
                    });
     //All_off devuelve:
         //- true si todo lo cumple
         //-false si al menos 1 no lo cumple
-    return std::all_of(aux_vector->begin(), aux_vector->end(), [](uint8_t result)
+    bool resultado = std::all_of(aux_vector->begin(), aux_vector->end(), [](uint8_t result)
                        { return result != 0; });
+        std::cout << "Resultado:" << resultado << std::endl;
+        return resultado;
     }
 
     std::string getInfo(){
