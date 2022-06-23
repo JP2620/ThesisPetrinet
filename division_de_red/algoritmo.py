@@ -45,8 +45,9 @@ for i in range(len(matriz_incidencia)):
         else:
             plazas_complejas.append(i + 1)
 
-# print(plazas_dos_entradas_una_salida)
-# print(plazas_dos_salidas_una_entrada)
+print(plazas_dos_entradas_una_salida)
+print(plazas_dos_salidas_una_entrada)
+print(plazas_complejas)
 # Buscamos las transiciones a evitar
 transiciones_indeseadas = set()
 transiciones_indeseadas_totales = set()
@@ -70,8 +71,13 @@ for j in range(len(matriz_incidencia[0])):
             transiciones_plazas_dos_salidas_una_entrada.append(j + 1)
             dict_plazas_dos_salidas_una_entrada[j+1] = (i)
 
+
+print(transiciones_indeseadas)
+
 # Busqueda de trenes sin recursos compartidos
 plazas_simples_cpy = plazas_simples.copy()
+plazas_dos_entradas_una_salida_cpy = plazas_dos_entradas_una_salida.copy()
+plazas_dos_salidas_una_entrada_cpy = plazas_dos_salidas_una_entrada.copy()
 # transiciones_plazas_dos_entradas_una_salida_cpy = transiciones_plazas_dos_entradas_una_salida.copy()
 # transiciones_plazas_dos_salidas_una_entrada = transiciones_plazas_dos_salidas_una_entrada.copy()
 transiciones_recorridas = []
@@ -98,7 +104,10 @@ while (len(plazas_simples_cpy) > 0):
                         # transicion_index = transiciones_plazas_dos_entradas_una_salida.index(t+1)
                         # transiciones_plazas_dos_entradas_una_salida.pop(transicion_index)
                         if t+1 in dict_plazas_dos_entradas_una_salida:
-                            res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
+                            if dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida_cpy:
+                                plaza_index = plazas_dos_entradas_una_salida_cpy.index(dict_plazas_dos_entradas_una_salida[t+1])
+                                plazas_dos_entradas_una_salida_cpy.pop(plaza_index)
+                                res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
                             # print("A agrego:")
                             # print(dict_plazas_dos_entradas_una_salida[t+1])
                             # print(res)
@@ -106,8 +115,11 @@ while (len(plazas_simples_cpy) > 0):
                     if(t+1 in transiciones_plazas_dos_salidas_una_entrada and matriz_incidencia[plaza - 1][t] == 1):
                         # transicion_index = transiciones_plazas_dos_salidas_una_entrada.index(t+1)
                         # transiciones_plazas_dos_salidas_una_entrada.pop(transicion_index)
-                         if t+1 in dict_plazas_dos_entradas_una_salida:
-                            res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
+                        if t+1 in dict_plazas_dos_salidas_una_entrada:
+                            if dict_plazas_dos_salidas_una_entrada[t+1] in plazas_dos_salidas_una_entrada_cpy:
+                                plaza_index = plazas_dos_salidas_una_entrada_cpy.index(dict_plazas_dos_salidas_una_entrada[t+1])
+                                plazas_dos_salidas_una_entrada_cpy.pop(plaza_index)
+                                res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
                             del dict_plazas_dos_salidas_una_entrada[t+1]
 
     # print(res)
