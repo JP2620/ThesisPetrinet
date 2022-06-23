@@ -45,8 +45,8 @@ for i in range(len(matriz_incidencia)):
         else:
             plazas_complejas.append(i + 1)
 
-print(plazas_dos_entradas_una_salida)
-print(plazas_dos_salidas_una_entrada)
+# print(plazas_dos_entradas_una_salida)
+# print(plazas_dos_salidas_una_entrada)
 # Buscamos las transiciones a evitar
 transiciones_indeseadas = set()
 transiciones_indeseadas_totales = set()
@@ -115,8 +115,13 @@ while (len(plazas_simples_cpy) > 0):
     caminos_con_inicio_fin_complejo_encontrados.append(res_con_plazas_especiales)
 print("Camino simple:")
 print(caminos_simples_encontrados)
-print("\nCamino con entradas y salidas")
+print("\nCamino con entradas y salidas:")
 print(caminos_con_inicio_fin_complejo_encontrados)
+
+print("\nCamino con entradas y salidas con tamaño > 1:")
+for vector in caminos_con_inicio_fin_complejo_encontrados:
+    if (len(vector) > 1)
+        print(vector)
 
 # Agrega recursos al inicio/final de 2 trenes
 # plazas_dos_entradas_una_salida_cpy = plazas_dos_entradas_una_salida.copy()
