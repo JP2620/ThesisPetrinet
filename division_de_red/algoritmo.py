@@ -120,7 +120,7 @@ print(caminos_con_inicio_fin_complejo_encontrados)
 
 print("\nCamino con entradas y salidas con tamaño > 1:")
 for vector in caminos_con_inicio_fin_complejo_encontrados:
-    if (len(vector) > 1)
+    if (len(vector) > 1):
         print(vector)
 
 # Agrega recursos al inicio/final de 2 trenes
