@@ -43,10 +43,13 @@ for i in range(len(matriz_incidencia)):
             else:
                 plazas_dos_salidas_una_entrada.append(i + 1)
         else:
-            plazas_complejas_total.append(i + 1)
+            plazas_complejas.append(i + 1)
 
+print(plazas_dos_entradas_una_salida)
+print(plazas_dos_salidas_una_entrada)
 # Buscamos las transiciones a evitar
 transiciones_indeseadas = set()
+transiciones_indeseadas_totales = set()
 transiciones_plazas_dos_entradas_una_salida = []
 transiciones_plazas_dos_salidas_una_entrada = []
 dict_plazas_dos_entradas_una_salida = {}
@@ -55,14 +58,15 @@ for j in range(len(matriz_incidencia[0])):
     for i in plazas_complejas:
         if (matriz_incidencia[i - 1][j] != 0):
             transiciones_indeseadas.add(j + 1)
+            transiciones_indeseadas_totales.add(j + 1)
     for i in plazas_dos_entradas_una_salida:
         if (matriz_incidencia[i - 1][j] != 0):
-            transiciones_indeseadas.add(j + 1)
+            transiciones_indeseadas_totales.add(j + 1)
             transiciones_plazas_dos_entradas_una_salida.append(j + 1)
             dict_plazas_dos_entradas_una_salida[j+1] = (i)
     for i in plazas_dos_salidas_una_entrada:
         if (matriz_incidencia[i - 1][j] != 0):
-            transiciones_indeseadas.add(j + 1)
+            transiciones_indeseadas_totales.add(j + 1)
             transiciones_plazas_dos_salidas_una_entrada.append(j + 1)
             dict_plazas_dos_salidas_una_entrada[j+1] = (i)
 
@@ -81,15 +85,16 @@ while (len(plazas_simples_cpy) > 0):
         plazas_simples_cpy.pop(plaza_index)
         for t in range(len(matriz_incidencia[plaza - 1])):
             if (matriz_incidencia[plaza - 1][t] != 0
-                    and (not t+1 in transiciones_recorridas)):
+                    and (not t+1 in transiciones_recorridas)
+                    and (not t+1 in transiciones_indeseadas)):
                 transiciones_recorridas.append(t+1)
-                if(not t+1 in transiciones_indeseadas):
+                if(not t+1 in transiciones_indeseadas_totales):
                     for p in range(len(np.transpose(matriz_incidencia)[t])):
                         if (matriz_incidencia[p][t] != 0 and p+1 in plazas_simples_cpy and not p+1 in res):
                             res.append(p + 1)
                             res_con_plazas_especiales.append(p+1)
                 else:
-                    if(t+1 in transiciones_plazas_dos_entradas_una_salida and matriz_incidencia[plaza - 1][t] == 1):
+                    if(t+1 in transiciones_plazas_dos_entradas_una_salida and matriz_incidencia[plaza - 1][t] == -1):
                         # transicion_index = transiciones_plazas_dos_entradas_una_salida.index(t+1)
                         # transiciones_plazas_dos_entradas_una_salida.pop(transicion_index)
                         if t+1 in dict_plazas_dos_entradas_una_salida:
@@ -98,7 +103,7 @@ while (len(plazas_simples_cpy) > 0):
                             # print(dict_plazas_dos_entradas_una_salida[t+1])
                             # print(res)
                             del dict_plazas_dos_entradas_una_salida[t+1]
-                    if(t+1 in transiciones_plazas_dos_salidas_una_entrada and matriz_incidencia[plaza - 1][t] == -1):
+                    if(t+1 in transiciones_plazas_dos_salidas_una_entrada and matriz_incidencia[plaza - 1][t] == 1):
                         # transicion_index = transiciones_plazas_dos_salidas_una_entrada.index(t+1)
                         # transiciones_plazas_dos_salidas_una_entrada.pop(transicion_index)
                          if t+1 in dict_plazas_dos_entradas_una_salida:
