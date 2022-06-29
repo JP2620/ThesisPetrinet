@@ -83,9 +83,13 @@ plazas_dos_salidas_una_entrada_cpy = plazas_dos_salidas_una_entrada.copy()
 transiciones_recorridas = []
 caminos_simples_encontrados = []
 caminos_con_inicio_fin_complejo_encontrados = []
+transiciones_de_caminos_simples_encontrados = []
+transiciones_de_caminos_con_inicio_fin_complejo_encontrados = []
 while (len(plazas_simples_cpy) > 0):
     res = [plazas_simples_cpy[0]]
+    res_transiciones_usadas = []
     res_con_plazas_especiales = [plazas_simples_cpy[0]]
+    res_transiciones_usadas_con_plazas_especiales = []
     for plaza in res:
         plaza_index = plazas_simples_cpy.index(plaza)
         plazas_simples_cpy.pop(plaza_index)
@@ -94,6 +98,8 @@ while (len(plazas_simples_cpy) > 0):
                     and (not t+1 in transiciones_recorridas)
                     and (not t+1 in transiciones_indeseadas)):
                 transiciones_recorridas.append(t+1)
+                res_transiciones_usadas.append(t+1)
+                res_transiciones_usadas_con_plazas_especiales.append(t+1)
                 if(not t+1 in transiciones_indeseadas_totales):
                     for p in range(len(np.transpose(matriz_incidencia)[t])):
                         if (matriz_incidencia[p][t] != 0 and p+1 in plazas_simples_cpy and not p+1 in res):
@@ -108,6 +114,9 @@ while (len(plazas_simples_cpy) > 0):
                                 plaza_index = plazas_dos_entradas_una_salida_cpy.index(dict_plazas_dos_entradas_una_salida[t+1])
                                 plazas_dos_entradas_una_salida_cpy.pop(plaza_index)
                                 res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
+                                for tt in range(len(matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1])):
+                                    if(tt != t and matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1][tt] != 0):
+                                        res_transiciones_usadas_con_plazas_especiales.append(tt+1)
                             # print("A agrego:")
                             # print(dict_plazas_dos_entradas_una_salida[t+1])
                             # print(res)
@@ -120,15 +129,24 @@ while (len(plazas_simples_cpy) > 0):
                                 plaza_index = plazas_dos_salidas_una_entrada_cpy.index(dict_plazas_dos_salidas_una_entrada[t+1])
                                 plazas_dos_salidas_una_entrada_cpy.pop(plaza_index)
                                 res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
+                                for tt in range(len(matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1] - 1])):
+                                    if(tt != t and matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1] - 1][tt] != 0):
+                                        res_transiciones_usadas_con_plazas_especiales.append(tt+1)
                             del dict_plazas_dos_salidas_una_entrada[t+1]
 
     # print(res)
     caminos_simples_encontrados.append(res)
     caminos_con_inicio_fin_complejo_encontrados.append(res_con_plazas_especiales)
+    transiciones_de_caminos_simples_encontrados.append(res_transiciones_usadas)
+    transiciones_de_caminos_con_inicio_fin_complejo_encontrados.append(res_transiciones_usadas_con_plazas_especiales)
+
 print("Camino simple:")
 print(caminos_simples_encontrados)
+print(transiciones_de_caminos_simples_encontrados)
 print("\nCamino con entradas y salidas:")
 print(caminos_con_inicio_fin_complejo_encontrados)
+print(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
+
 
 print("\nCamino con entradas y salidas con tamaño > 1:")
 for vector in caminos_con_inicio_fin_complejo_encontrados:
