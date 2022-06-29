@@ -45,9 +45,9 @@ for i in range(len(matriz_incidencia)):
         else:
             plazas_complejas.append(i + 1)
 
-print(plazas_dos_entradas_una_salida)
-print(plazas_dos_salidas_una_entrada)
-print(plazas_complejas)
+# print(plazas_dos_entradas_una_salida)
+# print(plazas_dos_salidas_una_entrada)
+# print(plazas_complejas)
 # Buscamos las transiciones a evitar
 transiciones_indeseadas = set()
 transiciones_indeseadas_totales = set()
@@ -72,7 +72,7 @@ for j in range(len(matriz_incidencia[0])):
             dict_plazas_dos_salidas_una_entrada[j+1] = (i)
 
 
-print(transiciones_indeseadas)
+# print(transiciones_indeseadas)
 
 # Busqueda de trenes sin recursos compartidos
 plazas_simples_cpy = plazas_simples.copy()
@@ -140,18 +140,18 @@ while (len(plazas_simples_cpy) > 0):
     transiciones_de_caminos_simples_encontrados.append(res_transiciones_usadas)
     transiciones_de_caminos_con_inicio_fin_complejo_encontrados.append(res_transiciones_usadas_con_plazas_especiales)
 
-print("Camino simple:")
-print(caminos_simples_encontrados)
-print(transiciones_de_caminos_simples_encontrados)
+# print("Camino simple:")
+# print(caminos_simples_encontrados)
+# print(transiciones_de_caminos_simples_encontrados)
 print("\nCamino con entradas y salidas:")
 print(caminos_con_inicio_fin_complejo_encontrados)
 print(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
 
 
-print("\nCamino con entradas y salidas con tamaño > 1:")
-for vector in caminos_con_inicio_fin_complejo_encontrados:
-    if (len(vector) > 1):
-        print(vector)
+# print("\nCamino con entradas y salidas con tamaño > 1:")
+# for vector in caminos_con_inicio_fin_complejo_encontrados:
+#     if (len(vector) > 1):
+#         print(vector)
 
 # Agrega recursos al inicio/final de 2 trenes
 # plazas_dos_entradas_una_salida_cpy = plazas_dos_entradas_una_salida.copy()
@@ -164,6 +164,18 @@ for vector in caminos_con_inicio_fin_complejo_encontrados:
 #         plazas_dos_entradas_una_salida_cpy.pop(plaza_index)
 #         for t in range(len(matriz_incidencia[plaza - 1])):
 #             if(matriz_incidencia[plaza - 1][t] != 1):
+
+
+# print(caminos_simples_encontrados)
+# print(transiciones_de_caminos_simples_encontrados)
+for numero_camino in range(len(caminos_simples_encontrados)):
+    print("   ",transiciones_de_caminos_simples_encontrados[numero_camino])
+    for p in caminos_simples_encontrados[numero_camino]:
+        temp = []
+        for t in transiciones_de_caminos_simples_encontrados[numero_camino]:
+           temp.append(matriz_incidencia[p-1][t-1])
+        print("P"+str(p),temp)
+    print("")
 
 
 # Closing file
