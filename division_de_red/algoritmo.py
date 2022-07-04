@@ -140,12 +140,19 @@ while (len(plazas_simples_cpy) > 0):
     transiciones_de_caminos_simples_encontrados.append(res_transiciones_usadas)
     transiciones_de_caminos_con_inicio_fin_complejo_encontrados.append(res_transiciones_usadas_con_plazas_especiales)
 
+plazas_complejas_cpy = plazas_complejas.copy()
+
+# while(len(plazas_complejas_cpy) > 0):
+#     for t in transiciones_indeseadas:
+#         if matriz_incidencia[plazas_complejas_cpy[0] - 1][t-1] != 0:
+            
+
 # print("Camino simple:")
 # print(caminos_simples_encontrados)
 # print(transiciones_de_caminos_simples_encontrados)
-print("\nCamino con entradas y salidas:")
-print(caminos_con_inicio_fin_complejo_encontrados)
-print(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
+# print("\nCamino con entradas y salidas:")
+# print(caminos_con_inicio_fin_complejo_encontrados)
+# print(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
 
 
 # print("\nCamino con entradas y salidas con tamaño > 1:")
@@ -168,16 +175,23 @@ print(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
 
 # print(caminos_simples_encontrados)
 # print(transiciones_de_caminos_simples_encontrados)
+matriz_incidencia_caminos_complejos = []
 for numero_camino in range(len(caminos_simples_encontrados)):
-    print("   ",transiciones_de_caminos_simples_encontrados[numero_camino])
-    for p in caminos_simples_encontrados[numero_camino]:
+    # print("   ",transiciones_de_caminos_simples_encontrados[numero_camino])
+    temp_padre = []
+    for indice_p in range(len(caminos_con_inicio_fin_complejo_encontrados[numero_camino])):
         temp = []
-        for t in transiciones_de_caminos_simples_encontrados[numero_camino]:
-           temp.append(matriz_incidencia[p-1][t-1])
-        print("P"+str(p),temp)
+        for t in transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_camino]:
+           temp.append(matriz_incidencia[caminos_con_inicio_fin_complejo_encontrados[numero_camino][indice_p] - 1][t-1])
+        # print("P"+str(p),temp)
+        temp_padre.append(temp)
+    matriz_incidencia_caminos_complejos.append(temp_padre)
     print("")
 
-
+print("\nCamino con entradas y salidas:")
+print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
+print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
+print("M Incidencia:",matriz_incidencia_caminos_complejos)
 # Closing file
 f.close()
 
