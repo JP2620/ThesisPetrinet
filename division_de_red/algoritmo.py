@@ -140,7 +140,7 @@ while (len(plazas_simples_cpy) > 0):
     transiciones_de_caminos_simples_encontrados.append(res_transiciones_usadas)
     transiciones_de_caminos_con_inicio_fin_complejo_encontrados.append(res_transiciones_usadas_con_plazas_especiales)
 
-plazas_complejas_cpy = plazas_complejas.copy()
+# plazas_complejas_cpy = plazas_complejas.copy()
 
 # while(len(plazas_complejas_cpy) > 0):
 #     for t in transiciones_indeseadas:
