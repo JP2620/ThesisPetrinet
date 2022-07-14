@@ -45,9 +45,9 @@ for i in range(len(matriz_incidencia)):
         else:
             plazas_complejas.append(i + 1)
 
-# print(plazas_dos_entradas_una_salida)
-# print(plazas_dos_salidas_una_entrada)
-# print(plazas_complejas)
+print(plazas_dos_entradas_una_salida)
+print(plazas_dos_salidas_una_entrada)
+print(plazas_complejas)
 # Buscamos las transiciones a evitar
 transiciones_indeseadas = set()
 transiciones_indeseadas_totales = set()
@@ -85,6 +85,7 @@ caminos_simples_encontrados = []
 caminos_con_inicio_fin_complejo_encontrados = []
 transiciones_de_caminos_simples_encontrados = []
 transiciones_de_caminos_con_inicio_fin_complejo_encontrados = []
+transiciones_borde = transiciones_indeseadas_totales.copy()
 while (len(plazas_simples_cpy) > 0):
     res = [plazas_simples_cpy[0]]
     res_transiciones_usadas = set()
@@ -111,6 +112,7 @@ while (len(plazas_simples_cpy) > 0):
                             # transiciones_plazas_dos_entradas_una_salida.pop(transicion_index)
                             if t+1 in dict_plazas_dos_entradas_una_salida:
                                 if dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida_cpy:
+                                    transiciones_borde.remove(t+1)
                                     plaza_index = plazas_dos_entradas_una_salida_cpy.index(dict_plazas_dos_entradas_una_salida[t+1])
                                     plazas_dos_entradas_una_salida_cpy.pop(plaza_index)
                                     res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
@@ -126,6 +128,7 @@ while (len(plazas_simples_cpy) > 0):
                             # transiciones_plazas_dos_salidas_una_entrada.pop(transicion_index)
                             if t+1 in dict_plazas_dos_salidas_una_entrada:
                                 if dict_plazas_dos_salidas_una_entrada[t+1] in plazas_dos_salidas_una_entrada_cpy:
+                                    transiciones_borde.remove(t+1)
                                     plaza_index = plazas_dos_salidas_una_entrada_cpy.index(dict_plazas_dos_salidas_una_entrada[t+1])
                                     plazas_dos_salidas_una_entrada_cpy.pop(plaza_index)
                                     res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
@@ -134,7 +137,22 @@ while (len(plazas_simples_cpy) > 0):
                                             res_transiciones_usadas_con_plazas_especiales.add(tt+1)
                                 del dict_plazas_dos_salidas_una_entrada[t+1]
 
-    # print(res)
+    # # print(res)
+    # if len(res) == 1 and len(res_transiciones_usadas_con_plazas_especiales) == 2: # Significa que esta rodeado de transiciones indeseadas (apunta arecurso compartido)
+    #     res_transiciones_plaza_sola = set()
+    #     for p in range(len(np.transpose(matriz_incidencia)[res_transiciones_usadas_con_plazas_especiales.])):
+    #         if matriz_incidencia[p][res_transiciones_usadas_con_plazas_especiales[0]] != 0 and matriz_incidencia[p][res_transiciones_usadas_con_plazas_especiales[1]] != 0 and p+1 in plazas_complejas:
+    #             res.append(p+1)
+    #             for t in range(len(matriz_incidencia[p])):
+    #                 if matriz_incidencia[p][t] != 0 and not p+1 in res_transiciones_usadas_con_plazas_especiales:
+    #                     res_transiciones_plaza_sola.add(t+1)
+    #                     res_transiciones_usadas_con_plazas_especiales.add(t+1)
+    #     for p in range(len(np.transpose(matriz_incidencia)[res_transiciones_plaza_sola[0]])):
+    #         if matriz_incidencia[p][res_transiciones_plaza_sola[0]] != 0 and matriz_incidencia[p][res_transiciones_plaza_sola[1]] != 0 and p+1 in plazas_simples_cpy:
+    #             res.append(p+1)
+    #             plaza_index = plazas_simples_cpy.index(p+1)
+    #             plazas_simples_cpy.pop(plaza_index)
+
     caminos_simples_encontrados.append(res)
     caminos_con_inicio_fin_complejo_encontrados.append(res_con_plazas_especiales)
     transiciones_de_caminos_simples_encontrados.append(res_transiciones_usadas)
@@ -189,6 +207,7 @@ for numero_camino in range(len(caminos_simples_encontrados)):
     print("")
 
 print("\nCamino con entradas y salidas:")
+print("Transiciones borde", transiciones_borde)
 print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
 print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
 print("M Incidencia:",matriz_incidencia_caminos_complejos)
