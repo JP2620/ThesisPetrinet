@@ -206,11 +206,26 @@ for numero_camino in range(len(caminos_simples_encontrados)):
     matriz_incidencia_caminos_complejos.append(temp_padre)
     print("")
 
-print("\nCamino con entradas y salidas:")
-print("Transiciones borde", transiciones_borde)
+##Calculo Matriz Relacion:
+matriz_relacion = []
+for conjunto in transiciones_de_caminos_con_inicio_fin_complejo_encontrados:
+    temp = []
+    for t in transiciones_borde:
+        if t in conjunto:
+            temp.append(1)
+        else:
+            temp.append(0)
+    matriz_relacion.append(temp)
+
+
+print("\nCamino con matriz_relacionentradas y salidas:")
 print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
 print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
 print("M Incidencia:",matriz_incidencia_caminos_complejos)
+# print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
+print("Transiciones borde", transiciones_borde)
+print("Matriz relacion", matriz_relacion)
+
 # Closing file
 f.close()
 
