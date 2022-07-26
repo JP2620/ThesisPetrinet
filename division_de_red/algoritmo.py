@@ -146,21 +146,6 @@ while (len(plazas_simples_cpy) > 0): # Voy a intentar recorrer todas las plazas 
                                     res.append(p + 1)
                                     res_con_plazas_especiales.append(p+1)
                                     transiciones_borde.add(t+1)
-    # # print(res)
-    # if len(res) == 1 and len(res_transiciones_usadas_con_plazas_especiales) == 2: # Significa que esta rodeado de transiciones indeseadas (apunta arecurso compartido)
-    #     res_transiciones_plaza_sola = set()
-    #     for p in range(len(np.transpose(matriz_incidencia)[res_transiciones_usadas_con_plazas_especiales.])):
-    #         if matriz_incidencia[p][res_transiciones_usadas_con_plazas_especiales[0]] != 0 and matriz_incidencia[p][res_transiciones_usadas_con_plazas_especiales[1]] != 0 and p+1 in plazas_complejas:
-    #             res.append(p+1)
-    #             for t in range(len(matriz_incidencia[p])):
-    #                 if matriz_incidencia[p][t] != 0 and not p+1 in res_transiciones_usadas_con_plazas_especiales:
-    #                     res_transiciones_plaza_sola.add(t+1)
-    #                     res_transiciones_usadas_con_plazas_especiales.add(t+1)
-    #     for p in range(len(np.transpose(matriz_incidencia)[res_transiciones_plaza_sola[0]])):
-    #         if matriz_incidencia[p][res_transiciones_plaza_sola[0]] != 0 and matriz_incidencia[p][res_transiciones_plaza_sola[1]] != 0 and p+1 in plazas_simples_cpy:
-    #             res.append(p+1)
-    #             plaza_index = plazas_simples_cpy.index(p+1)
-    #             plazas_simples_cpy.pop(plaza_index)
 
     caminos_simples_encontrados.append(res)
     caminos_con_inicio_fin_complejo_encontrados.append(res_con_plazas_especiales)
