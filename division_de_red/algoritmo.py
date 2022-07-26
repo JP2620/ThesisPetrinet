@@ -4,9 +4,44 @@
   
   
 import json
+from typing import List
 import numpy as np
 from sqlalchemy import false
   
+def clasificar_plazas(matriz_incidencia) -> List[List]:
+    plazas_simples = []
+    plazas_complejas = []
+    plazas_dos_entradas_una_salida = []
+    plazas_dos_salidas_una_entrada = []
+    plazas_complejas_total = [] #complejas+dosentradas+dossalidas
+
+    # Buscamos las plazas con no más de una entrada o salida
+    for i in range(len(matriz_incidencia)):
+        contador_plazas: int = 0
+        contador_transiciones: int = 0
+        tipos_entradas = {
+            1: 0,
+            -1: 0
+        }
+        for j in range(len(matriz_incidencia[0])):
+            if (matriz_incidencia[i][j] == 1):
+                tipos_entradas[1] += 1
+            elif (matriz_incidencia[i][j] == -1):
+                tipos_entradas[-1] += 1
+        if (not (tipos_entradas[1] > 1 or tipos_entradas[-1] > 1)):
+            plazas_simples.append(i + 1) # Guardamos las plazas que tengan como maximo 1 entrada y 1 salida
+        else:
+            plazas_complejas_total.append(i + 1)
+            if(tipos_entradas[1] == 1 or tipos_entradas[-1] == 1):
+                if(tipos_entradas[1] == 2):
+                    plazas_dos_entradas_una_salida.append(i + 1) # Guardamos las plazas con 2 salidas y 1 entrada maximo
+                else:
+                    plazas_dos_salidas_una_entrada.append(i + 1) # Guardamos las plazas con 2 entrada y 1 salidas maximo
+            else:
+                plazas_complejas.append(i + 1)
+    
+    return [plazas_simples, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada, plazas_complejas_total]
+
 # Opening JSON file
 f = open('matriz.json')
   
@@ -14,36 +49,13 @@ f = open('matriz.json')
 # a dictionary
 data = json.load(f)
 matriz_incidencia = data["Incidencia"]
-plazas_simples = []
-plazas_complejas = []
-plazas_dos_entradas_una_salida = []
-plazas_dos_salidas_una_entrada = []
-plazas_complejas_total = [] #complejas+dosentradas+dossalidas
 
 # Buscamos las plazas con no más de una entrada o salida
-for i in range(len(matriz_incidencia)):
-    contador_plazas: int = 0
-    contador_transiciones: int = 0
-    tipos_entradas = {
-        1: 0,
-        -1: 0
-    }
-    for j in range(len(matriz_incidencia[0])):
-        if (matriz_incidencia[i][j] == 1):
-            tipos_entradas[1] += 1
-        elif (matriz_incidencia[i][j] == -1):
-            tipos_entradas[-1] += 1
-    if (not (tipos_entradas[1] > 1 or tipos_entradas[-1] > 1)):
-        plazas_simples.append(i + 1) # Guardamos las plazas que tengan como maximo 1 entrada y 1 salida
-    else:
-        plazas_complejas_total.append(i + 1)
-        if(tipos_entradas[1] == 1 or tipos_entradas[-1] == 1):
-            if(tipos_entradas[1] == 2):
-                plazas_dos_entradas_una_salida.append(i + 1) # Guardamos las plazas con 2 salidas y 1 entrada maximo
-            else:
-                plazas_dos_salidas_una_entrada.append(i + 1) # Guardamos las plazas con 2 entrada y 1 salidas maximo
-        else:
-            plazas_complejas.append(i + 1)
+plazas_simples,\
+plazas_complejas,\
+plazas_dos_entradas_una_salida,\
+plazas_dos_salidas_una_entrada,\
+plazas_complejas_total = clasificar_plazas(matriz_incidencia)
 
 print(plazas_dos_entradas_una_salida)
 print(plazas_dos_salidas_una_entrada)
