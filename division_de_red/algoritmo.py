@@ -6,7 +6,6 @@
 import json
 from typing import List
 import numpy as np
-from sqlalchemy import false
   
 def clasificar_plazas(matriz_incidencia) -> List[List]:
     plazas_simples = []
@@ -16,14 +15,14 @@ def clasificar_plazas(matriz_incidencia) -> List[List]:
     plazas_complejas_total = [] #complejas+dosentradas+dossalidas
 
     # Buscamos las plazas con no más de una entrada o salida
-    for i in range(len(matriz_incidencia)):
+    for i in range(N_PLAZAS):
         contador_plazas: int = 0
         contador_transiciones: int = 0
         tipos_entradas = {
             1: 0,
             -1: 0
         }
-        for j in range(len(matriz_incidencia[0])):
+        for j in range(N_TRANSICIONES):
             if (matriz_incidencia[i][j] > 0):
                 tipos_entradas[1] += 1
             elif (matriz_incidencia[i][j] < 0):
@@ -50,6 +49,9 @@ f = open('matriz.json')
 data = json.load(f)
 matriz_incidencia = data["Incidencia"]
 
+N_PLAZAS = len(matriz_incidencia)
+N_TRANSICIONES = len(matriz_incidencia[0])
+
 # Buscamos las plazas con no más de una entrada o salida
 plazas_simples,\
 plazas_complejas,\
@@ -71,7 +73,7 @@ transiciones_plazas_dos_entradas_una_salida = []
 transiciones_plazas_dos_salidas_una_entrada = []
 dict_plazas_dos_entradas_una_salida = {}
 dict_plazas_dos_salidas_una_entrada = {}
-for j in range(len(matriz_incidencia[0])):
+for j in range(N_TRANSICIONES):
     for i in plazas_complejas:
         if (matriz_incidencia[i - 1][j] != 0):
             transiciones_indeseadas.add(j + 1)
@@ -107,7 +109,7 @@ while (len(plazas_simples) > 0): # Voy a intentar recorrer todas las plazas de 1
     for plaza in res: #recorro todas las plazas de res para buscar plazas conectadas a esta y agregarlas al mismo
         plaza_index = plazas_simples.index(plaza)
         plazas_simples.pop(plaza_index)
-        for t in range(len(matriz_incidencia[plaza - 1])):
+        for t in range(N_TRANSICIONES):
             if (matriz_incidencia[plaza - 1][t] != 0): # Si es distinto de 0 significa que esta T esta conectada a la plaza que estoy analizando
                 res_transiciones_usadas_con_plazas_especiales.add(t+1)
                 res_transiciones_usadas.add(t+1)
@@ -115,19 +117,23 @@ while (len(plazas_simples) > 0): # Voy a intentar recorrer todas las plazas de 1
                     if (not t+1 in transiciones_indeseadas): # La transicion no sea de un recurso compartido
                         transiciones_recorridas.append(t+1)
                         if(not t+1 in transiciones_indeseadas_totales): # Si la transicion tiene max 1 entrada/salida o es de un recurso interno busco las plazas atadas a esta
-                            for p in range(len(np.transpose(matriz_incidencia)[t])):
+                            for p in range(N_PLAZAS):
                                 if (matriz_incidencia[p][t] != 0 and p+1 in plazas_simples and not p+1 in res): # Si la plaza esta conectado a esta transicion, es simple (1 in/out max) y no esta en res
                                     res.append(p + 1)
                                     res_con_plazas_especiales.append(p+1)
                         # Significa que la transicion esta conectada a una plaza de 2i1o o 2o1i
                         else:
+                            """
+                            t+1 está conectada a una plaza con 2i1o o 1i2o 
+
+                            """
                             if(t+1 in transiciones_plazas_dos_entradas_una_salida and matriz_incidencia[plaza - 1][t] < 0):
                                 if t+1 in dict_plazas_dos_entradas_una_salida and dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida:
                                     transiciones_borde.remove(t+1)
                                     plaza_index = plazas_dos_entradas_una_salida.index(dict_plazas_dos_entradas_una_salida[t+1])
                                     plazas_dos_entradas_una_salida.pop(plaza_index)
                                     res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
-                                    for tt in range(len(matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1])):
+                                    for tt in range(N_TRANSICIONES):
                                         if(tt != t and matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1][tt] != 0):
                                             res_transiciones_usadas_con_plazas_especiales.add(tt+1)
                                     del dict_plazas_dos_entradas_una_salida[t+1]
@@ -137,12 +143,12 @@ while (len(plazas_simples) > 0): # Voy a intentar recorrer todas las plazas de 1
                                     plaza_index = plazas_dos_salidas_una_entrada.index(dict_plazas_dos_salidas_una_entrada[t+1])
                                     plazas_dos_salidas_una_entrada.pop(plaza_index)
                                     res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
-                                    for tt in range(len(matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1] - 1])):
+                                    for tt in range(N_TRANSICIONES):
                                         if(tt != t and matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1] - 1][tt] != 0):
                                             res_transiciones_usadas_con_plazas_especiales.add(tt+1)
                                     del dict_plazas_dos_salidas_una_entrada[t+1]
                     else: # No recurrida pero conectada a un recurso compartido
-                        for p in range(len(np.transpose(matriz_incidencia)[t])):
+                        for p in range(N_PLAZAS):
                                 # Si la plaza esta conectado a esta transicion, es simple (1 in/out max) y no esta en res
                                 if (matriz_incidencia[p][t] != 0 and p+1 in plazas_simples and not p+1 in res): 
                                     res.append(p + 1)
@@ -159,7 +165,7 @@ while (len(plazas_simples) > 0): # Voy a intentar recorrer todas las plazas de 1
 for p in plazas_complejas:
     encontro = False
     transiciones_conectadas = set()
-    for t in range(len(matriz_incidencia[p-1])):
+    for t in range(N_TRANSICIONES):
         if matriz_incidencia[p-1][t] != 0:
             transiciones_conectadas.add(t+1)
     for t_conjunto in range(len(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)):
@@ -180,7 +186,7 @@ for p in plazas_complejas:
                 transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto].add(t_faltantes)
             for t_no_faltantes in temp2:
                 transiciones_borde.remove(t_no_faltantes)
-                for p_conectados in range(len(np.transpose(matriz_incidencia)[t_no_faltantes-1])):
+                for p_conectados in range(N_PLAZAS):
                     if(matriz_incidencia[p_conectados-1][t_no_faltantes-1] != 0 and not p_conectados+1 in caminos_con_inicio_fin_complejo_encontrados[t_conjunto]):
                         transiciones_borde.add(t_no_faltantes) # Si hay alguna plaza que no forme parte del subconujunto agrego la transicion como borde
             print("Deberia agregar la plaza", p, "en el arreglo", caminos_con_inicio_fin_complejo_encontrados[t_conjunto], "y", temp, "en ", transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto])
