@@ -124,29 +124,34 @@ while (len(plazas_simples) > 0): # Voy a intentar recorrer todas las plazas de 1
                         # Significa que la transicion esta conectada a una plaza de 2i1o o 2o1i
                         else:
                             """
-                            t+1 está conectada a una plaza con 2i1o o 1i2o 
-
+                            la transición está conectada a una plaza con 2i1o o 1i2o 
                             """
-                            if(t+1 in transiciones_plazas_dos_entradas_una_salida and matriz_incidencia[plaza - 1][t] < 0):
-                                if t+1 in dict_plazas_dos_entradas_una_salida and dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida:
-                                    transiciones_borde.remove(t+1)
-                                    plaza_index = plazas_dos_entradas_una_salida.index(dict_plazas_dos_entradas_una_salida[t+1])
-                                    plazas_dos_entradas_una_salida.pop(plaza_index)
-                                    res_con_plazas_especiales.append(dict_plazas_dos_entradas_una_salida[t+1])
-                                    for tt in range(N_TRANSICIONES):
-                                        if(tt != t and matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1][tt] != 0):
-                                            res_transiciones_usadas_con_plazas_especiales.add(tt+1)
-                                    del dict_plazas_dos_entradas_una_salida[t+1]
-                            if(t+1 in transiciones_plazas_dos_salidas_una_entrada and matriz_incidencia[plaza - 1][t] > 0):
-                                if t+1 in dict_plazas_dos_salidas_una_entrada and dict_plazas_dos_salidas_una_entrada[t+1] in plazas_dos_salidas_una_entrada:
-                                    transiciones_borde.remove(t+1)
-                                    plaza_index = plazas_dos_salidas_una_entrada.index(dict_plazas_dos_salidas_una_entrada[t+1])
-                                    plazas_dos_salidas_una_entrada.pop(plaza_index)
-                                    res_con_plazas_especiales.append(dict_plazas_dos_salidas_una_entrada[t+1])
-                                    for tt in range(N_TRANSICIONES):
-                                        if(tt != t and matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1] - 1][tt] != 0):
-                                            res_transiciones_usadas_con_plazas_especiales.add(tt+1)
-                                    del dict_plazas_dos_salidas_una_entrada[t+1]
+                            if (t+1 in transiciones_plazas_dos_entradas_una_salida 
+                                    and t+1 in dict_plazas_dos_entradas_una_salida
+                                    and dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida
+                                    and matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1][t] > 0): # Si es de entrada
+                                plaza_dos_entradas_una_salida = dict_plazas_dos_entradas_una_salida[t+1]
+                                transiciones_borde.remove(t+1)
+                                plaza_index = plazas_dos_entradas_una_salida.index(plaza_dos_entradas_una_salida)
+                                plazas_dos_entradas_una_salida.pop(plaza_index)
+                                res_con_plazas_especiales.append(plaza_dos_entradas_una_salida)
+                                for tt in range(N_TRANSICIONES):
+                                    if(tt != t and matriz_incidencia[plaza_dos_entradas_una_salida - 1][tt] != 0):
+                                        res_transiciones_usadas_con_plazas_especiales.add(tt+1)
+                                del plaza_dos_entradas_una_salida
+                            if(t+1 in transiciones_plazas_dos_salidas_una_entrada
+                                    and t+1 in dict_plazas_dos_salidas_una_entrada
+                                    and dict_plazas_dos_salidas_una_entrada[t+1] in plazas_dos_salidas_una_entrada
+                                    and matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1]- 1][t] < 0):
+                                plaza_dos_salidas_una_entrada = dict_plazas_dos_salidas_una_entrada[t+1]
+                                transiciones_borde.remove(t+1)
+                                plaza_index = plazas_dos_salidas_una_entrada.index(plaza_dos_salidas_una_entrada)
+                                plazas_dos_salidas_una_entrada.pop(plaza_index)
+                                res_con_plazas_especiales.append(plaza_dos_salidas_una_entrada)
+                                for tt in range(N_TRANSICIONES):
+                                    if(tt != t and matriz_incidencia[plaza_dos_salidas_una_entrada - 1][tt] != 0):
+                                        res_transiciones_usadas_con_plazas_especiales.add(tt+1)
+                                del plaza_dos_salidas_una_entrada
                     else: # No recurrida pero conectada a un recurso compartido
                         for p in range(N_PLAZAS):
                                 # Si la plaza esta conectado a esta transicion, es simple (1 in/out max) y no esta en res
