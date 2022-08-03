@@ -31,7 +31,7 @@ def clasificar_plazas(matriz_incidencia) -> List[List]:
             plazas_simples.append(i + 1) # Guardamos las plazas que tengan como maximo 1 entrada y 1 salida
         else:
             plazas_complejas_total.append(i + 1)
-            if(tipos_entradas[1] == 1 or tipos_entradas[-1] == 1):
+            if(tipos_entradas[1] <= 1 or tipos_entradas[-1] <= 1):
                 if(tipos_entradas[1] == 2):
                     plazas_dos_entradas_una_salida.append(i + 1) # Guardamos las plazas con 2 salidas y 1 entrada maximo
                 else:
@@ -176,7 +176,7 @@ for p in plazas_complejas:
     transiciones_conectadas = set()
     for t in range(N_TRANSICIONES):
         if matriz_incidencia[p-1][t] != 0:
-            transiciones_conectadas.add(t+1)
+            transiciones_conectadas.add(t+1) # Guarda transiciones conectadas al recurso compartido
     for t_conjunto in range(len(transiciones_de_caminos_con_inicio_fin_complejo_encontrados)):
         cantidad_encontradas = 0
         temp = []
