@@ -73,6 +73,100 @@ def try_add_to_train_2i1o_1i2o(t,res_con_plazas_especiales,res_transiciones_usad
                 res_transiciones_usadas_con_plazas_especiales.add(tt+1)
         del plaza_dos_salidas_una_entrada
 
+def generate_mincov_json_input_general(matriz) -> None:
+    with open("./salida/matriz_incidencia_general.json", "w") as f:
+        file = {}
+        plazas = []
+        transiciones = []
+        arcos = []
+        for j, columna in enumerate(matriz[0]):
+            transicion = {
+                "index": j,
+                "type": "immediate",
+                "guard": True,
+                "event": True,
+            }
+            transiciones.append(transicion)
+        for j, fila in enumerate(matriz):
+            # Create json object
+            plaza = {
+                "index": j,
+                "type": "discrete",
+                "initial_marking": marcado_inicial[j],
+            }
+            plazas.append(plaza)
+            for k, columna in enumerate(fila):
+                if columna > 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": False, 
+                        "source": k,
+                        "target": j,
+                        "weight": columna,
+                    }
+                    arcos.append(arco)
+                elif columna < 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": True, 
+                        "source": j,
+                        "target": k,
+                        "weight": -columna,
+                    }
+                    arcos.append(arco)
+                
+        file["places"] = plazas
+        file["transitions"] = transiciones
+        file["arcs"] = arcos
+        f.write(json.dumps(file))
+
+def generate_mincov_json_input (i, matriz) -> None:
+    with open("./salida/matriz_incidencia_" + str(i) + ".json", "w") as f:
+        file = {}
+        plazas = []
+        transiciones = []
+        arcos = []
+        for j, columna in enumerate(matriz[0]):
+            transicion = {
+                "index": j,
+                "type": "immediate",
+                "guard": True,
+                "event": True,
+            }
+            transiciones.append(transicion)
+        for j, fila in enumerate(matriz):
+            # Create json object
+            plaza = {
+                "index": j,
+                "type": "discrete",
+                "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
+            }
+            plazas.append(plaza)
+            for k, columna in enumerate(fila):
+                if columna > 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": False, 
+                        "source": k,
+                        "target": j,
+                        "weight": columna,
+                    }
+                    arcos.append(arco)
+                elif columna < 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": True, 
+                        "source": j,
+                        "target": k,
+                        "weight": -columna,
+                    }
+                    arcos.append(arco)
+                
+        file["places"] = plazas
+        file["transitions"] = transiciones
+        file["arcs"] = arcos
+        f.write(json.dumps(file))
+
 # Opening JSON file
 f = open('matriz.json')
   
@@ -249,54 +343,9 @@ f.close()
 for abc in matriz_incidencia_caminos_complejos:
     print("\n\n",abc)
 
-
 for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
-    with open("matriz_incidencia_" + str(i) + ".json", "a") as f:
-        file = {}
-        plazas = []
-        transiciones = []
-        arcos = []
-        for j, columna in enumerate(matriz[0]):
-            transicion = {
-                "index": j,
-                "type": "immediate",
-                "guard": True,
-                "event": True,
-            }
-            transiciones.append(transicion)
-        for j, fila in enumerate(matriz):
-            # Create json object
-            plaza = {
-                "index": j,
-                "type": "discrete",
-                "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
-            }
-            plazas.append(plaza)
-            for k, columna in enumerate(fila):
-                if columna > 0:
-                    arco = {
-                        "type": "regular",
-                        "from_place": False, 
-                        "source": k,
-                        "target": j,
-                        "weight": columna,
-                    }
-                    arcos.append(arco)
-                elif columna < 0:
-                    arco = {
-                        "type": "regular",
-                        "from_place": True, 
-                        "source": j,
-                        "target": k,
-                        "weight": -columna,
-                    }
-                    arcos.append(arco)
-                
-        file["places"] = plazas
-        file["transitions"] = transiciones
-        file["arcs"] = arcos
-        f.write(json.dumps(file))
-
+    generate_mincov_json_input(i,matriz)
+generate_mincov_json_input_general(matriz_incidencia)
 
 
 
