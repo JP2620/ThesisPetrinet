@@ -80,6 +80,7 @@ f = open('matriz.json')
 # a dictionary
 data = json.load(f)
 matriz_incidencia = data["Incidencia"]
+marcado_inicial = data["Marcado"]
 
 N_PLAZAS = len(matriz_incidencia)
 N_TRANSICIONES = len(matriz_incidencia[0])
@@ -241,6 +242,60 @@ print("Matriz relacion", matriz_relacion)
 
 # Closing file
 f.close()
+
+
+
+
+for abc in matriz_incidencia_caminos_complejos:
+    print("\n\n",abc)
+
+
+for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
+    with open("matriz_incidencia_" + str(i) + ".json", "a") as f:
+        file = {}
+        plazas = []
+        transiciones = []
+        arcos = []
+        for j, columna in enumerate(matriz[0]):
+            transicion = {
+                "index": j,
+                "type": "immediate",
+                "guard": True,
+                "event": True,
+            }
+            transiciones.append(transicion)
+        for j, fila in enumerate(matriz):
+            # Create json object
+            plaza = {
+                "index": j,
+                "type": "discrete",
+                "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
+            }
+            plazas.append(plaza)
+            for k, columna in enumerate(fila):
+                if columna > 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": False, 
+                        "source": k,
+                        "target": j,
+                        "weight": columna,
+                    }
+                    arcos.append(arco)
+                elif columna < 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": True, 
+                        "source": j,
+                        "target": k,
+                        "weight": -columna,
+                    }
+                    arcos.append(arco)
+                
+        file["places"] = plazas
+        file["transitions"] = transiciones
+        file["arcs"] = arcos
+        f.write(json.dumps(file))
 
 
 
