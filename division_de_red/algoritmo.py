@@ -118,6 +118,16 @@ def generate_mincov_json_input_general(matriz) -> None:
         file["places"] = plazas
         file["transitions"] = transiciones
         file["arcs"] = arcos
+
+        network = {
+            "id": "ejemplo",
+            "amount_places": len(plazas),
+            "amount_transitions": len(transiciones),
+            "time_scale": "millisecond",
+            "is_temporal": False,
+            "network_type": "discrete",
+        }
+        file["network"] = network
         f.write(json.dumps(file))
 
 def generate_mincov_json_input (i, matriz) -> None:
@@ -165,6 +175,16 @@ def generate_mincov_json_input (i, matriz) -> None:
         file["places"] = plazas
         file["transitions"] = transiciones
         file["arcs"] = arcos
+
+        network = {
+            "id": "ejemplo",
+            "amount_places": len(plazas),
+            "amount_transitions": len(transiciones),
+            "time_scale": "millisecond",
+            "is_temporal": False,
+            "network_type": "discrete",
+        }
+        file["network"] = network
         f.write(json.dumps(file))
 
 # Opening JSON file
