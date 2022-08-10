@@ -325,13 +325,14 @@ matriz_relacion = []
 transiciones_con_plazas_aux = []
 for i, conjunto in enumerate(transiciones_de_caminos_con_inicio_fin_complejo_encontrados):
     temp = []
-    temp_transiciones_con_plazas_aux = set()
+    temp_transiciones_con_plazas_aux = []
     for t in transiciones_borde:
         if t in conjunto:
             temp.append(1)
             for p in range(N_PLAZAS):
                 if matriz_incidencia[p][t-1] < 0 and not p+1 in caminos_con_inicio_fin_complejo_encontrados[i]:
-                    temp_transiciones_con_plazas_aux.add(t)
+                    temp_transiciones_con_plazas_aux.append(t)
+                    break
         else:
             temp.append(0)
     matriz_relacion.append(temp)
