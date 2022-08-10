@@ -320,6 +320,22 @@ for p in plazas_complejas:
         transiciones_de_caminos_con_inicio_fin_complejo_encontrados.append(transiciones_conectadas)
 
             
+# Calculo Matriz Relacion:
+matriz_relacion = []
+transiciones_con_plazas_aux = []
+for i, conjunto in enumerate(transiciones_de_caminos_con_inicio_fin_complejo_encontrados):
+    temp = []
+    temp_transiciones_con_plazas_aux = set()
+    for t in transiciones_borde:
+        if t in conjunto:
+            temp.append(1)
+            for p in range(N_PLAZAS):
+                if matriz_incidencia[p][t-1] < 0 and not p+1 in caminos_con_inicio_fin_complejo_encontrados[i]:
+                    temp_transiciones_con_plazas_aux.add(t)
+        else:
+            temp.append(0)
+    matriz_relacion.append(temp)
+    transiciones_con_plazas_aux.append(temp_transiciones_con_plazas_aux)
 
 
 # Obtengo la matriz incidencias
@@ -334,18 +350,6 @@ for numero_camino in range(len(caminos_simples_encontrados)):
     matriz_incidencia_caminos_complejos.append(temp_padre)
     print("")
 
-# Calculo Matriz Relacion:
-matriz_relacion = []
-for conjunto in transiciones_de_caminos_con_inicio_fin_complejo_encontrados:
-    temp = []
-    for t in transiciones_borde:
-        if t in conjunto:
-            temp.append(1)
-        else:
-            temp.append(0)
-    matriz_relacion.append(temp)
-
-
 print("\nCamino con matriz_relacionentradas y salidas:")
 print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
 print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
@@ -353,6 +357,7 @@ print("M Incidencia:",matriz_incidencia_caminos_complejos)
 # print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
 print("Transiciones borde", transiciones_borde)
 print("Matriz relacion", matriz_relacion)
+print("Plazas aux", transiciones_con_plazas_aux)
 
 # Closing file
 f.close()
