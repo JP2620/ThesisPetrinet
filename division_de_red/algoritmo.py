@@ -7,6 +7,11 @@ import json
 from typing import List
 from itertools import compress, product
 import numpy as np
+
+""" Entra set() sale <elemento1>-<elemento1><elemento1>-<elemento1> """
+def set_to_string(items):
+    string_set = '-'.join(list([str(num) for num in items]))
+    return string_set
   
 def combinations(items):
     return ( set(compress(items,mask)) for mask in product(*[[0,1]]*len(items)) )
@@ -135,7 +140,7 @@ def generate_mincov_json_input_general(matriz) -> None:
         f.write(json.dumps(file))
 
 def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> None:
-    with open("./salida/matriz_incidencia_" + str(i) + "_" +str(plazas_temp_con_mark) + ".json", "w") as f:
+    with open("./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json", "w") as f:
         file = {}
         plazas = []
         transiciones = []
@@ -398,8 +403,9 @@ for abc in matriz_incidencia_caminos_complejos:
     print("\n\n",abc)
 
 for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
-    generate_mincov_json_input(i,matriz, {})
+    generate_mincov_json_input(i,matriz, set())
     for plazas_temp_con_mark in combinations(transiciones_con_plazas_aux[i]):
         if len(plazas_temp_con_mark) > 0:
+            set_to_string(plazas_temp_con_mark)
             generate_mincov_json_input(i,matriz, plazas_temp_con_mark)
 generate_mincov_json_input_general(matriz_incidencia)
