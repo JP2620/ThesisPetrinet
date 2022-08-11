@@ -5,8 +5,12 @@
   
 import json
 from typing import List
+from itertools import compress, product
 import numpy as np
   
+def combinations(items):
+    return ( set(compress(items,mask)) for mask in product(*[[0,1]]*len(items)) )
+
 def clasificar_plazas(matriz_incidencia) -> List[List]:
     plazas_simples = []
     plazas_complejas = []
@@ -130,8 +134,8 @@ def generate_mincov_json_input_general(matriz) -> None:
         file["network"] = network
         f.write(json.dumps(file))
 
-def generate_mincov_json_input (i, matriz) -> None:
-    with open("./salida/matriz_incidencia_" + str(i) + ".json", "w") as f:
+def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> None:
+    with open("./salida/matriz_incidencia_" + str(i) + "_" +str(plazas_temp_con_mark) + ".json", "w") as f:
         file = {}
         plazas = []
         transiciones = []
@@ -146,11 +150,26 @@ def generate_mincov_json_input (i, matriz) -> None:
             transiciones.append(transicion)
         for j, fila in enumerate(matriz):
             # Create json object
-            plaza = {
-                "index": j,
-                "type": "discrete",
-                "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
-            }
+            plaza_a_verificar = caminos_con_inicio_fin_complejo_encontrados[i][j]
+            if plaza_a_verificar < 0: #significa que es una aux
+                if plaza_a_verificar*-1 in plazas_temp_con_mark:
+                    plaza = {
+                        "index": j,
+                        "type": "discrete",
+                        "initial_marking":1,
+                    }
+                else:
+                    plaza = {
+                        "index": j,
+                        "type": "discrete",
+                        "initial_marking":0,
+                    }
+            else:
+                plaza = {
+                    "index": j,
+                    "type": "discrete",
+                    "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
+                }
             plazas.append(plaza)
             for k, columna in enumerate(fila):
                 if columna > 0:
@@ -348,6 +367,15 @@ for numero_camino in range(len(caminos_simples_encontrados)):
         for t in transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_camino]:
            temp.append(matriz_incidencia[caminos_con_inicio_fin_complejo_encontrados[numero_camino][indice_p] - 1][t-1])
         temp_padre.append(temp)
+    for tt in transiciones_con_plazas_aux[numero_camino]:
+        temp = []
+        for t in transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_camino]:
+            if t==tt:
+                temp.append(-1)
+            else:
+                temp.append(0)
+        temp_padre.append(temp)
+        caminos_con_inicio_fin_complejo_encontrados[numero_camino].append(tt*-1)
     matriz_incidencia_caminos_complejos.append(temp_padre)
     print("")
 
@@ -370,10 +398,8 @@ for abc in matriz_incidencia_caminos_complejos:
     print("\n\n",abc)
 
 for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
-    generate_mincov_json_input(i,matriz)
+    generate_mincov_json_input(i,matriz, {})
+    for plazas_temp_con_mark in combinations(transiciones_con_plazas_aux[i]):
+        if len(plazas_temp_con_mark) > 0:
+            generate_mincov_json_input(i,matriz, plazas_temp_con_mark)
 generate_mincov_json_input_general(matriz_incidencia)
-
-
-
-
-
