@@ -6,11 +6,6 @@
             "to": "n5"
         },
         {
-            "from": "n4",
-            "path": "n4 --(T4)--> n5",
-            "to": "n5"
-        },
-        {
             "from": "n3",
             "path": "n3 --(T3)--> n4",
             "to": "n4"
@@ -44,52 +39,47 @@
     "network": "ejemplo",
     "nodes": [
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n5",
-            "state": "[W W W W ]"
+            "state": "[0 0 0 0 0 0 1 0 0 0 ]"
         },
         {
-            "group": "omega",
-            "id": "n5",
-            "state": "[W W W W ]"
-        },
-        {
-            "group": "omega",
+            "group": "not omega",
             "id": "n4",
-            "state": "[W W W 1 ]"
+            "state": "[0 0 0 0 0 1 0 0 0 0 ]"
         },
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n4",
-            "state": "[W W W 1 ]"
+            "state": "[0 0 0 0 0 1 0 0 0 0 ]"
         },
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n3",
-            "state": "[W W 1 1 ]"
+            "state": "[0 0 0 0 1 0 0 0 0 0 ]"
         },
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n3",
-            "state": "[W W 1 1 ]"
+            "state": "[0 0 0 0 1 0 0 0 0 0 ]"
         },
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n2",
-            "state": "[W 1 1 1 ]"
+            "state": "[0 0 0 1 0 0 0 0 0 0 ]"
         },
         {
-            "group": "omega",
+            "group": "not omega",
             "id": "n2",
-            "state": "[W 1 1 1 ]"
+            "state": "[0 0 0 1 0 0 0 0 0 0 ]"
         },
         {
             "group": "root",
             "id": "n1",
-            "state": "[1 1 1 1 ]"
+            "state": "[0 0 0 0 0 0 0 0 0 1 ]"
         }
     ],
-    "places": 4,
-    "time": 2098.058,
+    "places": 5,
+    "time": 1800.948,
     "transitions": 5
 }

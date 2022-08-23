@@ -1,0 +1,185 @@
+{
+    "edges": [
+        {
+            "from": "n8",
+            "path": "n8 --(T6)--> n10",
+            "to": "n10"
+        },
+        {
+            "from": "n8",
+            "path": "n8 --(T6)--> n10",
+            "to": "n10"
+        },
+        {
+            "from": "n6",
+            "path": "n6 --(T4)--> n8",
+            "to": "n8"
+        },
+        {
+            "from": "n4",
+            "path": "n4 --(T6)--> n7",
+            "to": "n7"
+        },
+        {
+            "from": "n6",
+            "path": "n6 --(T4)--> n8",
+            "to": "n8"
+        },
+        {
+            "from": "n6",
+            "path": "n6 --(T6)--> n9",
+            "to": "n9"
+        },
+        {
+            "from": "n4",
+            "path": "n4 --(T3)--> n6",
+            "to": "n6"
+        },
+        {
+            "from": "n2",
+            "path": "n2 --(T6)--> n5",
+            "to": "n5"
+        },
+        {
+            "from": "n4",
+            "path": "n4 --(T3)--> n6",
+            "to": "n6"
+        },
+        {
+            "from": "n4",
+            "path": "n4 --(T6)--> n7",
+            "to": "n7"
+        },
+        {
+            "from": "n2",
+            "path": "n2 --(T2)--> n4",
+            "to": "n4"
+        },
+        {
+            "from": "n1",
+            "path": "n1 --(T6)--> n3",
+            "to": "n3"
+        },
+        {
+            "from": "n2",
+            "path": "n2 --(T2)--> n4",
+            "to": "n4"
+        },
+        {
+            "from": "n2",
+            "path": "n2 --(T6)--> n5",
+            "to": "n5"
+        },
+        {
+            "from": "n1",
+            "path": "n1 --(T1)--> n2",
+            "to": "n2"
+        },
+        {
+            "from": "n1",
+            "path": "n1 --(T1)--> n2",
+            "to": "n2"
+        },
+        {
+            "from": "n1",
+            "path": "n1 --(T6)--> n3",
+            "to": "n3"
+        }
+    ],
+    "network": "ejemplo",
+    "nodes": [
+        {
+            "group": "not omega",
+            "id": "n10",
+            "state": "[0 0 0 0 0 0 0 0 2 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n10",
+            "state": "[0 0 0 0 0 0 0 0 2 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n8",
+            "state": "[0 0 0 0 0 0 0 0 1 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n7",
+            "state": "[0 1 0 0 0 0 0 0 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n8",
+            "state": "[0 0 0 0 0 0 0 0 1 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n9",
+            "state": "[0 0 1 0 0 0 0 0 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n6",
+            "state": "[0 0 1 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n5",
+            "state": "[1 0 0 0 0 0 0 0 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n6",
+            "state": "[0 0 1 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n7",
+            "state": "[0 1 0 0 0 0 0 0 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n4",
+            "state": "[0 1 0 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n3",
+            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n4",
+            "state": "[0 1 0 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n5",
+            "state": "[1 0 0 0 0 0 0 0 1 0 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n2",
+            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n2",
+            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
+        },
+        {
+            "group": "not omega",
+            "id": "n3",
+            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
+        },
+        {
+            "group": "root",
+            "id": "n1",
+            "state": "[0 0 0 0 0 0 0 1 0 1 ]"
+        }
+    ],
+    "places": 6,
+    "time": 4175.482,
+    "transitions": 6
+}

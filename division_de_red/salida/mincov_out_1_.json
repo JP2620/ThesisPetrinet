@@ -1,0 +1,14 @@
+{
+    "edges": [],
+    "network": "ejemplo",
+    "nodes": [
+        {
+            "group": "root",
+            "id": "n1",
+            "state": "[0 0 0 0 0 0 0 0 0 0 ]"
+        }
+    ],
+    "places": 5,
+    "time": 347.312,
+    "transitions": 5
+}
