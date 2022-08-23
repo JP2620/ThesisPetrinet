@@ -91,95 +91,95 @@
         {
             "group": "not omega",
             "id": "n10",
-            "state": "[0 0 0 0 2 0 ]"
+            "state": "[0 0 0 0 0 0 0 0 2 0 ]"
         },
         {
             "group": "not omega",
             "id": "n10",
-            "state": "[0 0 0 0 2 0 ]"
+            "state": "[0 0 0 0 0 0 0 0 2 0 ]"
         },
         {
             "group": "not omega",
             "id": "n8",
-            "state": "[0 0 0 0 1 1 ]"
+            "state": "[0 0 0 0 0 0 0 0 1 1 ]"
         },
         {
             "group": "not omega",
             "id": "n7",
-            "state": "[0 0 1 0 1 0 ]"
+            "state": "[0 1 0 0 0 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n8",
-            "state": "[0 0 0 0 1 1 ]"
+            "state": "[0 0 0 0 0 0 0 0 1 1 ]"
         },
         {
             "group": "not omega",
             "id": "n9",
-            "state": "[0 0 0 1 1 0 ]"
+            "state": "[0 0 1 0 0 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n6",
-            "state": "[0 0 0 1 0 1 ]"
+            "state": "[0 0 1 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n5",
-            "state": "[1 0 0 0 1 0 ]"
+            "state": "[1 0 0 0 0 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n6",
-            "state": "[0 0 0 1 0 1 ]"
+            "state": "[0 0 1 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n7",
-            "state": "[0 0 1 0 1 0 ]"
+            "state": "[0 1 0 0 0 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n4",
-            "state": "[0 0 1 0 0 1 ]"
+            "state": "[0 1 0 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n3",
-            "state": "[0 1 0 0 1 0 ]"
+            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n4",
-            "state": "[0 0 1 0 0 1 ]"
+            "state": "[0 1 0 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n5",
-            "state": "[1 0 0 0 1 0 ]"
+            "state": "[1 0 0 0 0 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n2",
-            "state": "[1 0 0 0 0 1 ]"
+            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n2",
-            "state": "[1 0 0 0 0 1 ]"
+            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n3",
-            "state": "[0 1 0 0 1 0 ]"
+            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
         },
         {
             "group": "root",
             "id": "n1",
-            "state": "[0 1 0 0 0 1 ]"
+            "state": "[0 0 0 0 0 0 0 1 0 1 ]"
         }
     ],
     "places": 6,
-    "time": 2369.469,
+    "time": 4175.482,
     "transitions": 6
 }
