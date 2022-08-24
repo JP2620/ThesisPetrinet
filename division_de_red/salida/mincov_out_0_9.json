@@ -146,37 +146,37 @@
         {
             "group": "not omega",
             "id": "n3",
-            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
+            "state": "[0 1 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n4",
-            "state": "[0 1 0 0 0 0 0 0 0 1 ]"
+            "state": "[0 0 1 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n5",
-            "state": "[1 0 0 0 0 0 0 0 1 0 ]"
+            "state": "[1 0 0 0 1 0 ]"
         },
         {
             "group": "not omega",
             "id": "n2",
-            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
+            "state": "[1 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n2",
-            "state": "[1 0 0 0 0 0 0 0 0 1 ]"
+            "state": "[1 0 0 0 0 1 ]"
         },
         {
             "group": "not omega",
             "id": "n3",
-            "state": "[0 0 0 0 0 0 0 1 1 0 ]"
+            "state": "[0 1 0 0 1 0 ]"
         },
         {
             "group": "root",
             "id": "n1",
-            "state": "[0 0 0 0 0 0 0 1 0 1 ]"
+            "state": "[0 1 0 0 0 1 ]"
         }
     ],
     "places": 6,
