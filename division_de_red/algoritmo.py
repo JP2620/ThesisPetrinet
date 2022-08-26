@@ -5,6 +5,8 @@
   
 import json
 from typing import List
+from os import listdir
+from os.path import isfile, join
 from itertools import compress, product
 import numpy as np
 
@@ -409,3 +411,49 @@ for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
             set_to_string(plazas_temp_con_mark)
             generate_mincov_json_input(i,matriz, plazas_temp_con_mark)
 generate_mincov_json_input_general(matriz_incidencia)
+
+
+
+
+
+
+
+
+"""
+Quiero que el programa me guarde una lista por cada subred que a
+su vez tenga una lista por cada combinacion de salida (las 
+combinaciones se dan si tiene plaza auxiliares ya que estas pueden
+estar habilitadas o deshabilitadas). Dentro de esta ultima lista 
+necesito todos los estados de la salidas y sus respectivas relaciones
+"""
+
+def stateToList(state: str) -> List[int]:
+    a = state.split(" ")[:-1]
+    a[0] = a[0][1:]
+    a = [int(x) for x in a]
+    return a
+
+def getArbolFromSalida(s: str):
+    with open(f"salida/{s}") as salida:
+        salida_json = json.load(salida)
+        return salida_json
+
+PREFIX = "mincov_out_"
+salidasMinCov = [f for f in listdir("salida") if f.find(PREFIX) != -1]
+lista_arboles_de_alcanzabilidad = []
+for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
+    salidas_de_la_subred = [s for s in salidasMinCov if s.startswith(f"{PREFIX}{i}")]
+    if len(salidas_de_la_subred) > 0:
+        lista_arboles_de_alcanzabilidad.append([])
+        arboles = lista_arboles_de_alcanzabilidad[i]
+        for s in salidas_de_la_subred:
+            arboles.append(getArbolFromSalida(s))
+
+print(lista_arboles_de_alcanzabilidad)
+
+
+
+
+
+
+
