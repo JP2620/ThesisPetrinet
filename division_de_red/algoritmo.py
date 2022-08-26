@@ -9,6 +9,7 @@ from os import listdir
 from os.path import isfile, join
 from itertools import compress, product
 import numpy as np
+import re
 
 """ Entra set() sale <elemento1>-<elemento1><elemento1>-<elemento1> """
 def set_to_string(items):
@@ -436,6 +437,33 @@ def stateToList(state: str) -> List[int]:
 def getArbolFromSalida(s: str):
     with open(f"salida/{s}") as salida:
         salida_json = json.load(salida)
+        array_nodos = [] # n1 = [0,0,1,0] va a ser [1, [0,0,1,0]]
+        array_conexiones = [] # n1 -> t5 -> n2 va a ser [1,2,5]
+        nodos_agregados = set()
+        for nodes in salida_json["nodes"]:
+            n = int(nodes["id"][1:])
+            if n not in nodos_agregados:
+                nodos_agregados.add(n)
+                temp = []
+                temp.append(n)
+                temp.append(stateToList(nodes["state"]))
+                array_nodos.append(temp)
+
+        array_conexiones = [] # n1 -> t5 -> n2 va a ser [1,5,2]
+        conexiones_agregadas = set()
+        for conexiones in salida_json["edges"]:
+            n = conexiones["path"]
+            if n not in conexiones_agregadas:
+                conexiones_agregadas.add(n)
+                temp = []
+                temp.append(int(conexiones["from"][1:]))
+                temp.append(int(re.search(r".*T(\d+)", n).groups()[0]))
+                temp.append(int(conexiones["to"][1:]))
+                array_conexiones.append(temp)
+
+        print("Los edge papu:")
+        print(array_conexiones)
+        
         return salida_json
 
 PREFIX = "mincov_out_"
@@ -449,11 +477,5 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
         for s in salidas_de_la_subred:
             arboles.append(getArbolFromSalida(s))
 
-print(lista_arboles_de_alcanzabilidad)
-
-
-
-
-
-
-
+# print("aca empieza")
+# print(lista_arboles_de_alcanzabilidad)
