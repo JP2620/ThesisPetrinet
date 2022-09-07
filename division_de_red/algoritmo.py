@@ -222,6 +222,7 @@ f = open('matriz.json')
 # a dictionary
 data = json.load(f)
 matriz_incidencia = data["Incidencia"]
+matriz_incidencia_transpuesta = np.transpose(matriz_incidencia)
 marcado_inicial = data["Marcado"]
 
 N_PLAZAS = len(matriz_incidencia)
@@ -349,8 +350,9 @@ for p in plazas_complejas:
 
             
 # Calculo Matriz Relacion:
-matriz_relacion = []
+matriz_relacion = [] # 1 columna por transicion borde y 1 fila por subred
 transiciones_con_plazas_aux = []
+transiciones_borde = list(transiciones_borde)
 for i, conjunto in enumerate(transiciones_de_caminos_con_inicio_fin_complejo_encontrados):
     temp = []
     temp_transiciones_con_plazas_aux = []
@@ -388,6 +390,7 @@ for numero_camino in range(len(caminos_simples_encontrados)):
     matriz_incidencia_caminos_complejos.append(temp_padre)
     print("")
 
+print("Marcado Inicial:",marcado_inicial)
 print("\nCamino con matriz_relacionentradas y salidas:")
 print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
 print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
@@ -477,27 +480,53 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
 print("aca empieza")
 print(lista_arboles_de_alcanzabilidad)
 
-def completarNodo(lista_nodos_subconjunto, lista_orden_plazas_subconjunto, marcado_incial):
-    lista_nodos_subconjunto_cpy = copy.deepcopy(lista_nodos_subconjunto)
+def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial):
+    lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     for i in range(N_PLAZAS):
-        if i+1 in lista_orden_plazas_subconjunto:
-            posicion = lista_orden_plazas_subconjunto.index(i+1)
-            for items in lista_nodos_subconjunto:
-                nodo = lista_nodos_subconjunto[items]
-                nodo_cpy = lista_nodos_subconjunto_cpy[items]
+        if i+1 in lista_orden_plazas_subred:
+            posicion = lista_orden_plazas_subred.index(i+1)
+            for nodos in lista_nodos_subred:
+                nodo = lista_nodos_subred[nodos]
+                nodo_cpy = lista_nodos_subred_cpy[nodos]
                 if i < len(nodo):
                     nodo[i] = nodo_cpy[posicion]
                 else:
                     nodo.append(nodo_cpy[posicion])
         else:
-            for items in lista_nodos_subconjunto:
-                nodo = lista_nodos_subconjunto[items]
+            for nodos in lista_nodos_subred:
+                nodo = lista_nodos_subred[nodos]
                 if i < len(nodo):
                     nodo[i] = marcado_incial[i]
                 else:
                     nodo.append(marcado_incial[i])
 
-print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
-for indice, lista_nodos in enumerate(lista_arboles_de_alcanzabilidad):
-    completarNodo(lista_nodos["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
-print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada):
+    for nodos in lista_nodos_subred:
+        for p in plaza_con_marcado_deseada:
+            if lista_nodos_subred[nodos][p] < 1:
+                break
+            return lista_nodos_subred[nodos]
+    return []
+
+# print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+    completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
+# print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+
+
+for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+    for plazas_aux in subred:
+        if plazas_aux != "none": # Las none ya las analice arriba
+            transicon_compartida = int(plazas_aux) # El nombre de la plaza_aux es el numero de transicion compartida que esta atada a esta
+            
+            vector_plazas_necesarias = []
+            for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
+                if valor_plaza < 0:
+                    vector_plazas_necesarias.append(plaza)
+
+            columna_abuscar_matriz_relacion = transiciones_borde.index(transicon_compartida) # Obtengo la columna que quiero verificar de la matriz de relacion para saber que subred las tienen como borde
+            for num_subred, fila in enumerate(matriz_relacion):
+                if fila[columna_abuscar_matriz_relacion] == 1 and num_subred != indice: # Si esa subred tiene el esa transicion borde y no es la subred que estoy analizando entonces sigo
+                    marcado_para_completar = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
+                    if len(marcado_para_completar) > 0:
+                        completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar)
