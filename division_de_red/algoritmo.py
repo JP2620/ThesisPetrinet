@@ -10,6 +10,7 @@ from os.path import isfile, join
 from itertools import compress, product
 import numpy as np
 import re
+import copy
 
 """ Entra set() sale <elemento1>-<elemento1><elemento1>-<elemento1> """
 def set_to_string(items):
@@ -437,15 +438,14 @@ def stateToList(state: str) -> List[int]:
 def getArbolFromSalida(s: str):
     with open(f"salida/{s}") as salida:
         salida_json = json.load(salida)
-        array_nodos = [] # n1 = [0,0,1,0] va a ser [1, [0,0,1,0]]
+        array_nodos = {} # n1 = [0,0,1,0] va a ser {1: [0,0,1,0]}
         array_conexiones = [] # n1 -> t5 -> n2 va a ser [1,5,2]
-        nodos_agregados = set()
         conexiones_agregadas = set()
 
         for nodes in salida_json["nodes"]:
             n = int(nodes["id"][1:])
             state = stateToList(nodes["state"])
-            array_nodos.append({n : state})
+            array_nodos[n] = state
 
         for conexiones in salida_json["edges"]:
             n = conexiones["path"]
@@ -476,3 +476,28 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
 
 print("aca empieza")
 print(lista_arboles_de_alcanzabilidad)
+
+def completarNodo(lista_nodos_subconjunto, lista_orden_plazas_subconjunto, marcado_incial):
+    lista_nodos_subconjunto_cpy = copy.deepcopy(lista_nodos_subconjunto)
+    for i in range(N_PLAZAS):
+        if i+1 in lista_orden_plazas_subconjunto:
+            posicion = lista_orden_plazas_subconjunto.index(i+1)
+            for items in lista_nodos_subconjunto:
+                nodo = lista_nodos_subconjunto[items]
+                nodo_cpy = lista_nodos_subconjunto_cpy[items]
+                if i < len(nodo):
+                    nodo[i] = nodo_cpy[posicion]
+                else:
+                    nodo.append(nodo_cpy[posicion])
+        else:
+            for items in lista_nodos_subconjunto:
+                nodo = lista_nodos_subconjunto[items]
+                if i < len(nodo):
+                    nodo[i] = marcado_incial[i]
+                else:
+                    nodo.append(marcado_incial[i])
+
+print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+for lista_nodos in lista_arboles_de_alcanzabilidad:
+    completarNodo(lista_nodos["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[0], marcado_inicial)
+print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
