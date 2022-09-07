@@ -498,6 +498,6 @@ def completarNodo(lista_nodos_subconjunto, lista_orden_plazas_subconjunto, marca
                     nodo.append(marcado_incial[i])
 
 print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
-for lista_nodos in lista_arboles_de_alcanzabilidad:
-    completarNodo(lista_nodos["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[0], marcado_inicial)
+for indice, lista_nodos in enumerate(lista_arboles_de_alcanzabilidad):
+    completarNodo(lista_nodos["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
 print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
