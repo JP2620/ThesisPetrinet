@@ -500,13 +500,21 @@ def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial)
                 else:
                     nodo.append(marcado_incial[i])
 
-def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada):
-    for nodos in lista_nodos_subred:
+def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo busca el primer marcarcado
+    lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
+    lista_marcados_posibles = []
+    for key, nodo in lista_nodos_subred.items():
+        conecta = True
         for p in plaza_con_marcado_deseada:
-            if lista_nodos_subred[nodos][p] < 1:
+            if nodo[p] < 1:
+                conecta = False
                 break
-            return lista_nodos_subred[nodos]
-    return []
+            else:
+                lista_nodos_subred_cpy[key][p] -= 1
+            # ANTES TIENE QUE ELIMINAR UN MARCADO DE ESTA PLAZA
+        if conecta: 
+            lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
+    return lista_marcados_posibles
 
 # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
@@ -529,4 +537,4 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
                 if fila[columna_abuscar_matriz_relacion] == 1 and num_subred != indice: # Si esa subred tiene el esa transicion borde y no es la subred que estoy analizando entonces sigo
                     marcado_para_completar = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
                     if len(marcado_para_completar) > 0:
-                        completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar)
+                        completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
