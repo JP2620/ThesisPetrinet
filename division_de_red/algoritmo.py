@@ -148,7 +148,7 @@ def generate_mincov_json_input_general(matriz) -> str:
         return salida_filename
 
 def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> str:
-    new_filename = "./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json" 
+    new_filename = "./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json"
     with open(new_filename, "w") as f:
         file = {}
         plazas = []
@@ -420,7 +420,7 @@ matriz_incidencia_... son entradas del algoritmo de gabi
 
 mincov_inputs = []
 for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
-    generate_mincov_json_input(i,matriz, set())
+    mincov_inputs.append(generate_mincov_json_input(i,matriz, set()))
     for plazas_temp_con_mark in combinations(transiciones_con_plazas_aux[i]):
         if len(plazas_temp_con_mark) > 0:
             set_to_string(plazas_temp_con_mark)
@@ -431,7 +431,7 @@ mincov_inputs.append(generate_mincov_json_input_general(matriz_incidencia))
 
 
 for mincov_input in mincov_inputs:
-    system(f"{PATH_MINCOV} -a {mincov_input}")
+    system(f"{PATH_MINCOV} -a {mincov_input} > /dev/null")
     sufix = re.search(r".*incidencia_(.*)", mincov_input).groups()[0]
     system(f"mv ./mincov_out.json ./salida/mincov_out_{sufix}.json ")
 
