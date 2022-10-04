@@ -5,12 +5,14 @@
   
 import json
 from typing import List
-from os import listdir
+from os import listdir, system
 from os.path import isfile, join
 from itertools import compress, product
 import numpy as np
 import re
 import copy
+
+PATH_MINCOV = "./salida/PetrinetSE-original"
 
 """ Entra set() sale <elemento1>-<elemento1><elemento1>-<elemento1> """
 def set_to_string(items):
@@ -86,8 +88,9 @@ def try_add_to_train_2i1o_1i2o(t,res_con_plazas_especiales,res_transiciones_usad
                 res_transiciones_usadas_con_plazas_especiales.add(tt+1)
         del plaza_dos_salidas_una_entrada
 
-def generate_mincov_json_input_general(matriz) -> None:
-    with open("./salida/matriz_incidencia_general.json", "w") as f:
+def generate_mincov_json_input_general(matriz) -> str:
+    salida_filename = "./salida/matriz_incidencia_.json"
+    with open(salida_filename, "w") as f:
         file = {}
         plazas = []
         transiciones = []
@@ -142,9 +145,11 @@ def generate_mincov_json_input_general(matriz) -> None:
         }
         file["network"] = network
         f.write(json.dumps(file))
+        return salida_filename
 
-def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> None:
-    with open("./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json", "w") as f:
+def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> str:
+    new_filename = "./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json" 
+    with open(new_filename, "w") as f:
         file = {}
         plazas = []
         transiciones = []
@@ -214,6 +219,7 @@ def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> None:
         }
         file["network"] = network
         f.write(json.dumps(file))
+    return new_filename
 
 # Opening JSON file
 f = open('matriz.json')
@@ -235,9 +241,9 @@ plazas_dos_entradas_una_salida,\
 plazas_dos_salidas_una_entrada,\
 plazas_complejas_total = clasificar_plazas(matriz_incidencia)
 
-print(plazas_dos_entradas_una_salida)
-print(plazas_dos_salidas_una_entrada)
-print(plazas_complejas)
+# print(plazas_dos_entradas_una_salida)
+# print(plazas_dos_salidas_una_entrada)
+# print(plazas_complejas)
 
 
 # Buscamos las transiciones a evitar y tambien guardamos unos keymap de:
@@ -333,7 +339,7 @@ for p in plazas_complejas:
                 temp.append(tplaza)
         if cantidad_encontradas > 1:
             encontro = True
-            print("Deberia agregar la plaza", p, "en el arreglo", caminos_con_inicio_fin_complejo_encontrados[t_conjunto], "y", temp, "en ", transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto])
+            # print("Deberia agregar la plaza", p, "en el arreglo", caminos_con_inicio_fin_complejo_encontrados[t_conjunto], "y", temp, "en ", transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto])
             caminos_con_inicio_fin_complejo_encontrados[t_conjunto].append(p)
             for t_faltantes in temp:
                 transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto].add(t_faltantes)
@@ -342,7 +348,7 @@ for p in plazas_complejas:
                 for p_conectados in range(N_PLAZAS):
                     if(matriz_incidencia[p_conectados-1][t_no_faltantes-1] != 0 and not p_conectados+1 in caminos_con_inicio_fin_complejo_encontrados[t_conjunto]):
                         transiciones_borde.add(t_no_faltantes) # Si hay alguna plaza que no forme parte del subconujunto agrego la transicion como borde
-            print("Deberia agregar la plaza", p, "en el arreglo", caminos_con_inicio_fin_complejo_encontrados[t_conjunto], "y", temp, "en ", transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto])
+            # print("Deberia agregar la plaza", p, "en el arreglo", caminos_con_inicio_fin_complejo_encontrados[t_conjunto], "y", temp, "en ", transiciones_de_caminos_con_inicio_fin_complejo_encontrados[t_conjunto])
             break
     if not encontro:
         caminos_con_inicio_fin_complejo_encontrados.append([p])
@@ -388,17 +394,17 @@ for numero_camino in range(len(caminos_simples_encontrados)):
         temp_padre.append(temp)
         caminos_con_inicio_fin_complejo_encontrados[numero_camino].append(tt*-1)
     matriz_incidencia_caminos_complejos.append(temp_padre)
-    print("")
+    # print("")
 
-print("Marcado Inicial:",marcado_inicial)
-print("\nCamino con matriz_relacionentradas y salidas:")
-print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
-print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
-print("M Incidencia:",matriz_incidencia_caminos_complejos)
-# print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
-print("Transiciones borde", transiciones_borde)
-print("Matriz relacion", matriz_relacion)
-print("Plazas aux", transiciones_con_plazas_aux)
+# print("Marcado Inicial:",marcado_inicial)
+# print("\nCamino con matriz_relacionentradas y salidas:")
+# print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
+# print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
+# print("M Incidencia:",matriz_incidencia_caminos_complejos)
+# # print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
+# print("Transiciones borde", transiciones_borde)
+# print("Matriz relacion", matriz_relacion)
+# print("Plazas aux", transiciones_con_plazas_aux)
 
 # Closing file
 f.close()
@@ -406,17 +412,28 @@ f.close()
 
 
 
-for abc in matriz_incidencia_caminos_complejos:
-    print("\n\n",abc)
+"""
+matriz_incidencia_... son entradas del algoritmo de gabi
+- Ejecutar algoritmo de gabi con cada una de esas entradas
+- Renombrar salidas del algoritmo de gabi con el patrón mincov_out_...etc
+"""
 
+mincov_inputs = []
 for i, matriz in enumerate(matriz_incidencia_caminos_complejos):
     generate_mincov_json_input(i,matriz, set())
     for plazas_temp_con_mark in combinations(transiciones_con_plazas_aux[i]):
         if len(plazas_temp_con_mark) > 0:
             set_to_string(plazas_temp_con_mark)
-            generate_mincov_json_input(i,matriz, plazas_temp_con_mark)
-generate_mincov_json_input_general(matriz_incidencia)
+            mincov_input_filename = generate_mincov_json_input(i,matriz, plazas_temp_con_mark)
+            mincov_inputs.append(mincov_input_filename)
+mincov_inputs.append(generate_mincov_json_input_general(matriz_incidencia))
 
+
+
+for mincov_input in mincov_inputs:
+    system(f"{PATH_MINCOV} -a {mincov_input}")
+    sufix = re.search(r".*incidencia_(.*)", mincov_input).groups()[0]
+    system(f"mv ./mincov_out.json ./salida/mincov_out_{sufix}.json ")
 
 
 
@@ -477,8 +494,8 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
             identificador_posibilidad = plazas_aux_con_marcadoinicial if plazas_aux_con_marcadoinicial != "" else "none"
             arboles[identificador_posibilidad] = getArbolFromSalida(s)
 
-print("aca empieza")
-print(lista_arboles_de_alcanzabilidad)
+# print("aca empieza")
+# print(lista_arboles_de_alcanzabilidad)
 
 def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
@@ -516,10 +533,10 @@ def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo 
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
     return lista_marcados_posibles
 
-# print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
     completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
-# print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 
 
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
