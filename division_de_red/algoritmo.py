@@ -479,6 +479,8 @@ def getArbolFromSalida(s: str):
 
         return {"nodos" : array_nodos, "conexiones": array_conexiones}
 
+def genminCovOutput ()
+
 PREFIX = "mincov_out_"
 salidasMinCov = [f for f in sorted(listdir("salida")) if f.find(PREFIX) != -1]
 lista_arboles_de_alcanzabilidad = []
@@ -495,7 +497,8 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
             arboles[identificador_posibilidad] = getArbolFromSalida(s)
 
 # print("aca empieza")
-# print(lista_arboles_de_alcanzabilidad)
+print(lista_arboles_de_alcanzabilidad)
+print("\n--------------SOY UN SEPARADOR--------------\n")
 
 def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
@@ -523,7 +526,7 @@ def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo 
     for key, nodo in lista_nodos_subred.items():
         conecta = True
         for p in plaza_con_marcado_deseada:
-            if nodo[p] < 1:
+            if nodo[p] < 1: #TODO: RESISAR QUE PASA CON W
                 conecta = False
                 break
             else:
@@ -555,3 +558,5 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
                     marcado_para_completar = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
                     if len(marcado_para_completar) > 0:
                         completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
+
+print(lista_arboles_de_alcanzabilidad)
