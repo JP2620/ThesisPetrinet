@@ -4,7 +4,7 @@
   
   
 import json
-from typing import List
+from typing import List, Any
 from os import listdir, system
 from os.path import isfile, join
 from itertools import compress, product
@@ -18,6 +18,13 @@ PATH_MINCOV = "./salida/PetrinetSE-original"
 def set_to_string(items):
     string_set = '-'.join(list([str(num) for num in items]))
     return string_set
+
+# take a list of int and return a string with the following format
+# [0, 1, 2, 3] -> "[0, 1, 2, 3 ]"
+
+def list_to_string(lista: List[int]) -> str:
+    return "[" + ", ".join([str(elem) for elem in lista]) + " ]"
+
   
 def combinations(items):
     return ( set(compress(items,mask)) for mask in product(*[[0,1]]*len(items)) )
@@ -146,6 +153,35 @@ def generate_mincov_json_input_general(matriz) -> str:
         file["network"] = network
         f.write(json.dumps(file))
         return salida_filename
+
+def generate_mincov_json_filled(arbol_de_alcanzabilidad, red_id):
+    for key in arbol_de_alcanzabilidad:
+        # print(key, arbol_de_alcanzabilidad[key])
+        # print("\n--------------SOY UN SEPARADOR--------------\n")
+        new_filename = "./salida/mincov_filled_out_" + str(red_id) + "_" +str(key) + ".json"
+        with open(new_filename, "w") as f:
+            file = {}
+            file["network"] = "red_" + str(key)
+            file["nodes"] = []
+            file["edges"] = []
+            for key2 in arbol_de_alcanzabilidad[key]["nodos"]:
+                print(key, key2)
+                print(arbol_de_alcanzabilidad[key]["nodos"][key2])
+                print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
+                file["nodes"].append({
+                        "id": "n" + str(key2),
+                        "state": list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]),
+                        "group": "root" if key2 == 1 else "not omega",
+                    })
+            for key3 in arbol_de_alcanzabilidad[key]["conexiones"]:
+                file["edges"].append({
+                    "from": "n" + str(key3[0]),
+                    "path": "n" + str(key3[0]) + " --(T" + str(key3[1]) + ")--> n" + str(key3[2]),
+                    "to": "n" + str(key3[2]),
+                })
+
+            f.write(json.dumps(file))
+
 
 def generate_mincov_json_input (i, matriz, plazas_temp_con_mark) -> str:
     new_filename = "./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json"
@@ -479,7 +515,6 @@ def getArbolFromSalida(s: str):
 
         return {"nodos" : array_nodos, "conexiones": array_conexiones}
 
-def genminCovOutput ()
 
 PREFIX = "mincov_out_"
 salidasMinCov = [f for f in sorted(listdir("salida")) if f.find(PREFIX) != -1]
@@ -559,4 +594,7 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
                     if len(marcado_para_completar) > 0:
                         completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
 
-print(lista_arboles_de_alcanzabilidad)
+
+for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
+    print(arboles)
+    generate_mincov_json_filled(arboles, i)
