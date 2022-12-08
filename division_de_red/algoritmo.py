@@ -154,6 +154,45 @@ def generate_mincov_json_input_general(matriz) -> str:
         f.write(json.dumps(file))
         return salida_filename
 
+def join_tree(arbol_de_alcanzabilidad, cantidad_plazas: int):
+    nodos = {}
+    conexiones = []
+    for subred_padre in arbol_de_alcanzabilidad:
+        for subred_hija in subred_padre:
+            if len(subred_padre[subred_hija]["nodos"][next(iter(subred_padre[subred_hija]["nodos"]))]) != cantidad_plazas:
+                break
+            nodos = nodos | subred_padre[subred_hija]["nodos"]
+            conexiones += subred_padre[subred_hija]["conexiones"]
+    return {"nodos" : nodos, "conexiones" : conexiones}
+
+
+def generate_mincov_json_filled2(arbol_de_alcanzabilidad):
+    # print(key, arbol_de_alcanzabilidad[key])
+    # print("\n--------------SOY UN SEPARADOR--------------\n")
+    new_filename = "./salida/mincov_filled_out_final.json"
+    with open(new_filename, "w") as f:
+        file = {}
+        file["network"] = "red_final"
+        file["nodes"] = []
+        file["edges"] = []
+        for key2 in arbol_de_alcanzabilidad["nodos"]:
+            # print(key, key2)
+            # print(arbol_de_alcanzabilidad[key]["nodos"][key2])
+            # print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
+            file["nodes"].append({
+                    "id": "n" + str(key2),
+                    "state": list_to_string(arbol_de_alcanzabilidad["nodos"][key2]),
+                    "group": "root" if key2 == 1 else "not omega",
+                })
+        for key3 in arbol_de_alcanzabilidad["conexiones"]:
+            file["edges"].append({
+                "from": "n" + str(key3[0]),
+                "path": "n" + str(key3[0]) + " --(T" + str(key3[1]) + ")--> n" + str(key3[2]),
+                "to": "n" + str(key3[2]),
+            })
+
+        f.write(json.dumps(file))
+
 def generate_mincov_json_filled(arbol_de_alcanzabilidad, red_id):
     for key in arbol_de_alcanzabilidad:
         # print(key, arbol_de_alcanzabilidad[key])
@@ -574,10 +613,15 @@ def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial)
                     nodo[i] = marcado_incial[i]
                 else:
                     nodo.append(marcado_incial[i])
+    for nodo in lista_nodos_subred:
+        if lista_nodos_subred[nodo] == marcado_incial:
+            return nodo
+    return -1
 
 def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo busca el primer marcarcado
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     lista_marcados_posibles = []
+    nodo_que_conecta = -1
     for key, nodo in lista_nodos_subred.items():
         conecta = True
         for p in plaza_con_marcado_deseada:
@@ -588,8 +632,9 @@ def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo 
                 lista_nodos_subred_cpy[key][p] -= 1
             # ANTES TIENE QUE ELIMINAR UN MARCADO DE ESTA PLAZA
         if conecta: 
+            nodo_que_conecta = key
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
-    return lista_marcados_posibles
+    return lista_marcados_posibles, nodo_que_conecta
 
 # # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
@@ -611,14 +656,24 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
             columna_abuscar_matriz_relacion = transiciones_borde.index(transicon_compartida) # Obtengo la columna que quiero verificar de la matriz de relacion para saber que subred las tienen como borde
             for num_subred, fila in enumerate(matriz_relacion):
                 if fila[columna_abuscar_matriz_relacion] == 1 and num_subred != indice: # Si esa subred tiene el esa transicion borde y no es la subred que estoy analizando entonces sigo
-                    marcado_para_completar = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
+                    marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
                     if len(marcado_para_completar) > 0:
-                        completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
-
+                        nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
+                        transicion_que_interconecta = []
+                        transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
+                        transicion_que_interconecta.append(int(plazas_aux))
+                        transicion_que_interconecta.append(nodo_propio)
+                        print("detecte la conexion: ", transicion_que_interconecta)
+                        subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
 
 for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
     # print(arboles)
+    print("a", arboles)
     generate_mincov_json_filled(arboles, i)
 
 
 print(json.dumps(lista_arboles_de_alcanzabilidad))
+
+arbol_completo = join_tree(lista_arboles_de_alcanzabilidad,N_PLAZAS)
+print(arbol_completo)
+generate_mincov_json_filled2(arbol_completo)
