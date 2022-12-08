@@ -165,9 +165,9 @@ def generate_mincov_json_filled(arbol_de_alcanzabilidad, red_id):
             file["nodes"] = []
             file["edges"] = []
             for key2 in arbol_de_alcanzabilidad[key]["nodos"]:
-                print(key, key2)
-                print(arbol_de_alcanzabilidad[key]["nodos"][key2])
-                print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
+                # print(key, key2)
+                # print(arbol_de_alcanzabilidad[key]["nodos"][key2])
+                # print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
                 file["nodes"].append({
                         "id": "n" + str(key2),
                         "state": list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]),
@@ -432,19 +432,23 @@ for numero_camino in range(len(caminos_simples_encontrados)):
     matriz_incidencia_caminos_complejos.append(temp_padre)
     # print("")
 
-# print("Marcado Inicial:",marcado_inicial)
-# print("\nCamino con matriz_relacionentradas y salidas:")
-# print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
-# print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
-# print("M Incidencia:",matriz_incidencia_caminos_complejos)
-# # print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
-# print("Transiciones borde", transiciones_borde)
-# print("Matriz relacion", matriz_relacion)
-# print("Plazas aux", transiciones_con_plazas_aux)
+# TODO: Ver si en un futuro se puede hacer que transiciones_de_caminos_con_inicio_fin_complejo_encontrados contenga lista)
+for i, transiciones in enumerate(transiciones_de_caminos_con_inicio_fin_complejo_encontrados):
+    transiciones_de_caminos_con_inicio_fin_complejo_encontrados[i] = list(transiciones)
+
+print("Marcado Inicial:",marcado_inicial)
+print("\nCamino con matriz_relacionentradas y salidas:")
+print("Plazas:",caminos_con_inicio_fin_complejo_encontrados)
+print("Transiciones:", transiciones_de_caminos_con_inicio_fin_complejo_encontrados)
+print("M Incidencia:",matriz_incidencia_caminos_complejos)
+# print("Tamaño matriz relacion", len(transiciones_borde), "x", len(caminos_con_inicio_fin_complejo_encontrados))
+print("Transiciones borde", transiciones_borde)
+print("Matriz relacion", matriz_relacion)
+print("Plazas aux", transiciones_con_plazas_aux)
 
 # Closing file
 f.close()
-
+print("\n--------------SOY UN SEPARADOR--------------\n")
 
 
 
@@ -491,7 +495,7 @@ def stateToList(state: str) -> List[int]:
     a = [int(x) for x in a]
     return a
 
-def getArbolFromSalida(s: str):
+def getArbolFromSalida(s: str, numero_sub_red: int):
     with open(f"salida/{s}") as salida:
         salida_json = json.load(salida)
         array_nodos = {} # n1 = [0,0,1,0] va a ser {1: [0,0,1,0]}
@@ -509,7 +513,7 @@ def getArbolFromSalida(s: str):
                 conexiones_agregadas.add(n)
                 temp = []
                 temp.append(int(conexiones["from"][1:]))
-                temp.append(int(re.search(r".*T(\d+)", n).groups()[0]))
+                temp.append(transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_sub_red][int(re.search(r".*T(\d+)", n).groups()[0])-1])
                 temp.append(int(conexiones["to"][1:]))
                 array_conexiones.append(temp)
 
@@ -529,7 +533,7 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
         for s in salidas_de_la_subred:
             plazas_aux_con_marcadoinicial = s[s.index(str(i))+2:].split(".")[0]
             identificador_posibilidad = plazas_aux_con_marcadoinicial if plazas_aux_con_marcadoinicial != "" else "none"
-            arboles[identificador_posibilidad] = getArbolFromSalida(s)
+            arboles[identificador_posibilidad] = getArbolFromSalida(s, i)
 
 # print("aca empieza")
 print(lista_arboles_de_alcanzabilidad)
@@ -576,6 +580,7 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
     completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
 # # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 
+interelacion_subredes = []
 
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
     for plazas_aux in subred:
@@ -596,5 +601,8 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
 
 
 for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
-    print(arboles)
+    # print(arboles)
     generate_mincov_json_filled(arboles, i)
+
+
+print(json.dumps(lista_arboles_de_alcanzabilidad))
