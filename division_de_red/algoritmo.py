@@ -495,8 +495,10 @@ def stateToList(state: str) -> List[int]:
     a = [int(x) for x in a]
     return a
 
-def getArbolFromSalida(s: str, numero_sub_red: int):
+def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: bool):
     with open(f"salida/{s}") as salida:
+        # if not is_none and index_nodos > 0:
+        #     index_nodos += 1
         salida_json = json.load(salida)
         array_nodos = {} # n1 = [0,0,1,0] va a ser {1: [0,0,1,0]}
         array_conexiones = [] # n1 -> t5 -> n2 va a ser [1,5,2]
@@ -504,6 +506,8 @@ def getArbolFromSalida(s: str, numero_sub_red: int):
 
         for nodes in salida_json["nodes"]:
             n = int(nodes["id"][1:])
+            if n!=1 or not is_none:
+                n += index_nodos
             state = stateToList(nodes["state"])
             array_nodos[n] = state
 
@@ -512,18 +516,30 @@ def getArbolFromSalida(s: str, numero_sub_red: int):
             if n not in conexiones_agregadas:
                 conexiones_agregadas.add(n)
                 temp = []
-                temp.append(int(conexiones["from"][1:]))
+                nodo_from = int(conexiones["from"][1:])
+                if nodo_from != 1 or not is_none:
+                    nodo_from += index_nodos
+                nodo_to = int(conexiones["to"][1:])
+                if nodo_to != 1 or not is_none:
+                    nodo_to += index_nodos
+                temp.append(nodo_from)
                 temp.append(transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_sub_red][int(re.search(r".*T(\d+)", n).groups()[0])-1])
-                temp.append(int(conexiones["to"][1:]))
+                temp.append(nodo_to)
                 array_conexiones.append(temp)
-
-        return {"nodos" : array_nodos, "conexiones": array_conexiones}
+        new_index_nodos = index_nodos + len(array_nodos) + 1
+        if is_none and len(array_nodos) == 1:
+            new_index_nodos -= 1
+        print("len", len(array_nodos))
+        print("new_index_nodos", new_index_nodos)
+        print("proximo", new_index_nodos + len(array_nodos))
+        return {"nodos" : array_nodos, "conexiones": array_conexiones}, new_index_nodos-1
 
 
 PREFIX = "mincov_out_"
 salidasMinCov = [f for f in sorted(listdir("salida")) if f.find(PREFIX) != -1]
 lista_arboles_de_alcanzabilidad = []
 
+index_nodos = 0
 for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
     salidas_de_la_subred = [s for s in salidasMinCov if s.startswith(f"{PREFIX}{i}")]
     if len(salidas_de_la_subred) > 0:
@@ -533,7 +549,7 @@ for i, subred in enumerate(caminos_con_inicio_fin_complejo_encontrados):
         for s in salidas_de_la_subred:
             plazas_aux_con_marcadoinicial = s[s.index(str(i))+2:].split(".")[0]
             identificador_posibilidad = plazas_aux_con_marcadoinicial if plazas_aux_con_marcadoinicial != "" else "none"
-            arboles[identificador_posibilidad] = getArbolFromSalida(s, i)
+            arboles[identificador_posibilidad], index_nodos  = getArbolFromSalida(s, i, index_nodos, identificador_posibilidad=="none")
 
 # print("aca empieza")
 print(lista_arboles_de_alcanzabilidad)
