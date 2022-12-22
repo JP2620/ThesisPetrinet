@@ -159,10 +159,10 @@ def join_tree(arbol_de_alcanzabilidad, cantidad_plazas: int):
     conexiones = []
     for subred_padre in arbol_de_alcanzabilidad:
         for subred_hija in subred_padre:
-            if len(subred_padre[subred_hija]["nodos"][next(iter(subred_padre[subred_hija]["nodos"]))]) != cantidad_plazas:
-                break
-            nodos = nodos | subred_padre[subred_hija]["nodos"]
-            conexiones += subred_padre[subred_hija]["conexiones"]
+            if len(subred_padre[subred_hija]["nodos"][next(iter(subred_padre[subred_hija]["nodos"]))]) == cantidad_plazas:
+                print("COMPLETO: ", subred_padre[subred_hija]["nodos"])
+                nodos = nodos | subred_padre[subred_hija]["nodos"]
+                conexiones += subred_padre[subred_hija]["conexiones"]
     return {"nodos" : nodos, "conexiones" : conexiones}
 
 
@@ -645,7 +645,7 @@ interelacion_subredes = []
 
 for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
     for plazas_aux in subred:
-        if plazas_aux != "none": # Las none ya las analice arriba
+        if plazas_aux != "none" and "-" not in plazas_aux: # Las none ya las analice arriba
             transicon_compartida = int(plazas_aux) # El nombre de la plaza_aux es el numero de transicion compartida que esta atada a esta
             
             vector_plazas_necesarias = []
