@@ -36,4 +36,8 @@
 .vscode/
 build/
 cmake-build-debug/
-./division_de_red/salida/
+
+mincov_filled_out*.json
+mincov_out*.json
+matriz_incidencia_.json
+matriz_incidencia_*_*.json
