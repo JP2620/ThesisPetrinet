@@ -12,7 +12,7 @@ import numpy as np
 import re
 import copy
 
-PATH_MINCOV = "./salida/PetrinetSE-original"
+PATH_MINCOV = "./salida2/PetrinetSE-original"
 
 """ Entra set() sale <elemento1>-<elemento1><elemento1>-<elemento1> """
 def set_to_string(items):
