@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageEnhance
 import os
 import subprocess
 import json
@@ -62,7 +62,7 @@ def create_grid(images, grid_size=(3, 3), image_size=(300, 300), line_width=5):
     # Iterar a través de las imágenes y colocarlas en la cuadrícula
     for i, image in enumerate(images):
         # Escalar la imagen
-        scaled_image = image.resize(image_size, Image.ANTIALIAS)
+        scaled_image = image.resize(image_size, Image.Resampling.LANCZOS)
         # Calcular la posición en la cuadrícula
         row = i // grid_size[0]
         col = i % grid_size[0]
@@ -71,7 +71,10 @@ def create_grid(images, grid_size=(3, 3), image_size=(300, 300), line_width=5):
         # Pegar la imagen en la cuadrícula
         grid_image.paste(scaled_image, (x, y))
 
-    return grid_image
+    enhancer = ImageEnhance.Sharpness(grid_image)
+    sharpened_grid_image = enhancer.enhance(2.0)  # Increase the value for more sharpness
+
+    return sharpened_grid_image
 
 import sys
 
@@ -89,7 +92,7 @@ def main():
 
     # Definir el tamaño de la cuadrícula y el tamaño individual de la imagen
     grid_size = (len(images), 1) # Ajustar según sea necesario
-    image_size = (400, 400) # Tamaño individual de la imagen
+    image_size = (800, 800) # Tamaño individual de la imagen
 
     # Crear la cuadrícula con las imágenes
     grid_image = create_grid(images, grid_size, image_size)
