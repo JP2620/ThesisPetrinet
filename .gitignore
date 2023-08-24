@@ -37,7 +37,12 @@
 build/
 cmake-build-debug/
 
+#json
 mincov_filled_out*.json
 mincov_out*.json
 matriz_incidencia_.json
 matriz_incidencia_*_*.json
+
+#images
+*.png
+*.dot
