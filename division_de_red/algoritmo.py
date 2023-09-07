@@ -571,7 +571,7 @@ def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: b
         print("len", len(array_nodos))
         print("new_index_nodos", new_index_nodos)
         print("proximo", new_index_nodos + len(array_nodos))
-        return {"nodos" : array_nodos, "conexiones": array_conexiones}, new_index_nodos-1
+        return {"nodos" : array_nodos, "conexiones": array_conexiones, "completo" : False}, new_index_nodos-1
 
 
 PREFIX = "mincov_out_"
@@ -636,18 +636,10 @@ def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo 
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
     return lista_marcados_posibles, nodo_que_conecta
 
-# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
-
-# Recoro todas las subredes y le envio la lista de nodos, lista de plazas con su nombre global incluyendo las auxiliares y marcado inicial global
-for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
-    completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
-# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
-
-interelacion_subredes = []
-
-for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+def nosetodavia(indice, subred):
     for plazas_aux in subred:
-        if plazas_aux != "none": # Las none ya las analice arriba
+        if subred[plazas_aux]["completo"] == False: # Solo reviso las que no complete
+            #print(plazas_aux["nodos"][0].size())
             transicones_compartidas = []
             if "-" in plazas_aux: # TODO: Seguro se puede mejorar. En las plaza_aux no none, tengo el nombre de las transiciones compartidas activas separadas con guion medio
                 transiciones_compartidas_strings = plazas_aux.split("-")
@@ -676,12 +668,36 @@ for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
                         marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
                         if len(marcado_para_completar) > 0:
                             nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
+                            subred[plazas_aux]["conectado"] = True
                             transicion_que_interconecta = []
                             transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
                             transicion_que_interconecta.append(int(plazas_aux))
                             transicion_que_interconecta.append(nodo_propio)
                             print("detecte la conexion: ", transicion_que_interconecta)
                             subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                            for indice_mr, valor in enumerate(matriz_relacion[indice]):
+                                if valor == 1:
+                                    for indice_red, red in enumerate(matriz_relacion): ## aca puedo recorer hasta indice total despues se ven las otras
+                                        if indice_red != indice and red[indice_mr] == 1:
+                                            print("voy a enviar:")
+                                            print(indice_red)
+                                            print(lista_arboles_de_alcanzabilidad[indice_red])
+                                            nosetodavia(indice_red, lista_arboles_de_alcanzabilidad[indice_red])
+                                            break
+                            
+
+
+
+# Recoro todas las subredes y le envio la lista de nodos, lista de plazas con su nombre global incluyendo las auxiliares y marcado inicial global
+for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+    completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
+    subred["none"]["completo"] = True
+# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+
+interelacion_subredes = []
+
+for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+    nosetodavia(indice, subred)
 
 for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
     # print(arboles)
@@ -694,3 +710,6 @@ print(json.dumps(lista_arboles_de_alcanzabilidad))
 arbol_completo = join_tree(lista_arboles_de_alcanzabilidad,N_PLAZAS)
 print(arbol_completo)
 generate_mincov_json_filled2(arbol_completo)
+
+print("------------------ FINAL ------------------")
+print(arbol_completo)
