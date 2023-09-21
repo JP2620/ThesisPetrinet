@@ -636,68 +636,76 @@ def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo 
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
     return lista_marcados_posibles, nodo_que_conecta
 
-def nosetodavia(indice, subred):
+
+def procesarSubredRelacionada(indice):
+    for indice_mr, valor in enumerate(matriz_relacion[indice]):
+        if valor == 1:
+            for indice_red, red in enumerate(matriz_relacion): ## aca puedo recorer hasta indice total despues se ven las otras
+                if indice_red != indice and red[indice_mr] == 1:
+                    completarSubred(indice_red, lista_arboles_de_alcanzabilidad[indice_red])
+                    break
+
+def completarSubred(indice, subred):
+    completeuna = False
     for plazas_aux in subred:
         if subred[plazas_aux]["completo"] == False: # Solo reviso las que no complete
-            #print(plazas_aux["nodos"][0].size())
-            transicones_compartidas = []
-            if "-" in plazas_aux: # TODO: Seguro se puede mejorar. En las plaza_aux no none, tengo el nombre de las transiciones compartidas activas separadas con guion medio
-                transiciones_compartidas_strings = plazas_aux.split("-")
-                for transcion_compartida_string in transiciones_compartidas_strings:
-                    transicones_compartidas.append(int(transcion_compartida_string))
+            if "none" in plazas_aux:
+                completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
+                completeuna = True
+                subred["none"]["completo"] = True
             else:
-                transicones_compartidas.append(int(plazas_aux)) # El nombre de la plaza_aux es el numero de transicion compartida que esta atada a esta
-            
-            vector_plazas_necesarias = []
-            columnas_abuscar_matriz_relacion = []
-            for transicon_compartida in transicones_compartidas:
-                for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
-                    if valor_plaza < 0:
-                        vector_plazas_necesarias.append(plaza)
+                transicones_compartidas = []
+                if "-" in plazas_aux: # TODO: Seguro se puede mejorar. En las plaza_aux no none, tengo el nombre de las transiciones compartidas activas separadas con guion medio
+                    transiciones_compartidas_strings = plazas_aux.split("-")
+                    for transcion_compartida_string in transiciones_compartidas_strings:
+                        transicones_compartidas.append(int(transcion_compartida_string))
+                else:
+                    transicones_compartidas.append(int(plazas_aux)) # El nombre de la plaza_aux es el numero de transicion compartida que esta atada a esta
+                
+                vector_plazas_necesarias = []
+                columnas_abuscar_matriz_relacion = []
+                for transicon_compartida in transicones_compartidas:
+                    for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
+                        if valor_plaza < 0:
+                            vector_plazas_necesarias.append(plaza)
 
-                columnas_abuscar_matriz_relacion.append(transiciones_borde.index(transicon_compartida))  # Obtengo la columna que quiero verificar de la matriz de relacion para saber que subred las tienen como borde
-            
-            for num_subred, fila in enumerate(matriz_relacion):
-                sigo = True
-                if num_subred != indice: # Si esa subred tiene el esa transicion borde y no es la subred que estoy analizando entonces sigo
-                    for columna_abuscar_matriz_relacion in columnas_abuscar_matriz_relacion:
-                        if fila[columna_abuscar_matriz_relacion] != 1:
-                            sigo = False
-                            break
-                    if sigo:
-                        marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
-                        if len(marcado_para_completar) > 0:
-                            nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
-                            subred[plazas_aux]["conectado"] = True
-                            transicion_que_interconecta = []
-                            transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
-                            transicion_que_interconecta.append(int(plazas_aux))
-                            transicion_que_interconecta.append(nodo_propio)
-                            print("detecte la conexion: ", transicion_que_interconecta)
-                            subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
-                            for indice_mr, valor in enumerate(matriz_relacion[indice]):
-                                if valor == 1:
-                                    for indice_red, red in enumerate(matriz_relacion): ## aca puedo recorer hasta indice total despues se ven las otras
-                                        if indice_red != indice and red[indice_mr] == 1:
-                                            print("voy a enviar:")
-                                            print(indice_red)
-                                            print(lista_arboles_de_alcanzabilidad[indice_red])
-                                            nosetodavia(indice_red, lista_arboles_de_alcanzabilidad[indice_red])
-                                            break
+                    columnas_abuscar_matriz_relacion.append(transiciones_borde.index(transicon_compartida))  # Obtengo la columna que quiero verificar de la matriz de relacion para saber que subred las tienen como borde
+                
+                for num_subred, fila in enumerate(matriz_relacion):
+                    sigo = True
+                    if num_subred != indice: # Si esa subred tiene el esa transicion borde y no es la subred que estoy analizando entonces sigo
+                        for columna_abuscar_matriz_relacion in columnas_abuscar_matriz_relacion:
+                            if fila[columna_abuscar_matriz_relacion] != 1:
+                                sigo = False
+                                break
+                        if sigo and lista_arboles_de_alcanzabilidad[num_subred]["none"]["completo"]:
+                            marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
+                            if len(marcado_para_completar) > 0:
+                                nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
+                                subred[plazas_aux]["conectado"] = True
+                                transicion_que_interconecta = []
+                                transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
+                                transicion_que_interconecta.append(int(plazas_aux))
+                                transicion_que_interconecta.append(nodo_propio)
+                                print("detecte la conexion: ", transicion_que_interconecta)
+                                subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                                completeuna = True
+    if completeuna:
+        procesarSubredRelacionada(indice)
                             
 
-
-
 # Recoro todas las subredes y le envio la lista de nodos, lista de plazas con su nombre global incluyendo las auxiliares y marcado inicial global
-for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
-    completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
-    subred["none"]["completo"] = True
-# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+# for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+#     completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
+#     subred["none"]["completo"] = True
+# # # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 
 interelacion_subredes = []
 
-for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
-    nosetodavia(indice, subred)
+# for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
+#     completarSubred(indice, subred)
+
+completarSubred(0, lista_arboles_de_alcanzabilidad[0])
 
 for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
     # print(arboles)
