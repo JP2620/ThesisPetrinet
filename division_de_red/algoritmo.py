@@ -154,12 +154,12 @@ def generate_mincov_json_input_general(matriz) -> str:
         f.write(json.dumps(file))
         return salida_filename
 
-def join_tree(arbol_de_alcanzabilidad, cantidad_plazas: int):
+def join_tree(arbol_de_alcanzabilidad):
     nodos = {}
     conexiones = []
     for subred_padre in arbol_de_alcanzabilidad:
         for subred_hija in subred_padre:
-            if len(subred_padre[subred_hija]["nodos"][next(iter(subred_padre[subred_hija]["nodos"]))]) == cantidad_plazas:
+            if subred_padre[subred_hija]["completo"]:
                 print("COMPLETO: ", subred_padre[subred_hija]["nodos"])
                 nodos = nodos | subred_padre[subred_hija]["nodos"]
                 conexiones += subred_padre[subred_hija]["conexiones"]
@@ -678,18 +678,21 @@ def completarSubred(indice, subred):
                             if fila[columna_abuscar_matriz_relacion] != 1:
                                 sigo = False
                                 break
-                        if sigo and lista_arboles_de_alcanzabilidad[num_subred]["none"]["completo"]:
-                            marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(lista_arboles_de_alcanzabilidad[num_subred]["none"]["nodos"], vector_plazas_necesarias)
-                            if len(marcado_para_completar) > 0:
-                                nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
-                                subred[plazas_aux]["conectado"] = True
-                                transicion_que_interconecta = []
-                                transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
-                                transicion_que_interconecta.append(int(plazas_aux))
-                                transicion_que_interconecta.append(nodo_propio)
-                                print("detecte la conexion: ", transicion_que_interconecta)
-                                subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
-                                completeuna = True
+                        if sigo:
+                            for arbol in lista_arboles_de_alcanzabilidad[num_subred].values():
+                                if arbol["completo"]:
+                                    marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(arbol["nodos"], vector_plazas_necesarias)
+                                    if len(marcado_para_completar) > 0:
+                                        nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
+                                        subred[plazas_aux]["completo"] = True
+                                        transicion_que_interconecta = []
+                                        transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
+                                        transicion_que_interconecta.append(int(plazas_aux))
+                                        transicion_que_interconecta.append(nodo_propio)
+                                        print("detecte la conexion: ", transicion_que_interconecta)
+                                        subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                                        completeuna = True
+                                        break # TODO: Despues deberiamos completar multiples conexiones
     if completeuna:
         procesarSubredRelacionada(indice)
                             
@@ -715,9 +718,10 @@ for i, arboles in enumerate(lista_arboles_de_alcanzabilidad):
 
 print(json.dumps(lista_arboles_de_alcanzabilidad))
 
-arbol_completo = join_tree(lista_arboles_de_alcanzabilidad,N_PLAZAS)
+arbol_completo = join_tree(lista_arboles_de_alcanzabilidad)
 print(arbol_completo)
 generate_mincov_json_filled2(arbol_completo)
 
 print("------------------ FINAL ------------------")
+print(lista_arboles_de_alcanzabilidad)
 print(arbol_completo)
