@@ -616,7 +616,8 @@ def completarNodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_incial)
     for nodo in lista_nodos_subred: # Voy a retorna el nodo si este es el nodo original
         if lista_nodos_subred[nodo] == marcado_incial:
             return nodo
-    return -1
+    print("No encontre ningun camio")
+    return -1 #TODO deberiamos devolver tambien un booleano que diga que no encontro nada
 
 def buscarMarcadoDeseado(lista_nodos_subred, plaza_con_marcado_deseada): # Solo busca el primer marcarcado
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
@@ -684,24 +685,25 @@ def completarSubred(indice, subred):
                                     marcado_para_completar, nodo_que_conecta = buscarMarcadoDeseado(arbol["nodos"], vector_plazas_necesarias)
                                     if len(marcado_para_completar) > 0:
                                         nodo_propio = completarNodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0]) # Por el momento solo voy a conectarlo con uno pero lo mejor seria conectarlo con todos
-                                        subred[plazas_aux]["completo"] = True
-                                        transicion_que_interconecta = []
-                                        transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
-                                        transicion_que_interconecta.append(int(plazas_aux))
-                                        transicion_que_interconecta.append(nodo_propio)
-                                        print("detecte la conexion: ", transicion_que_interconecta)
-                                        subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
-                                        completeuna = True
-                                        break # TODO: Despues deberiamos completar multiples conexiones
+                                        if nodo_propio != -1:
+                                            subred[plazas_aux]["completo"] = True
+                                            transicion_que_interconecta = []
+                                            transicion_que_interconecta.append(nodo_que_conecta) #TODO: FUNCIONA PARA CUANDO SOLO SE INTERCONECTA CON 1 T (0_1)
+                                            transicion_que_interconecta.append(int(plazas_aux))
+                                            transicion_que_interconecta.append(nodo_propio)
+                                            print("detecte la conexion: ", transicion_que_interconecta)
+                                            subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                                            completeuna = True
+                                            break # TODO: Despues deberiamos completar multiples conexiones
     if completeuna:
         procesarSubredRelacionada(indice)
                             
 
-# Recoro todas las subredes y le envio la lista de nodos, lista de plazas con su nombre global incluyendo las auxiliares y marcado inicial global
+# # # Recoro todas las subredes y le envio la lista de nodos, lista de plazas con su nombre global incluyendo las auxiliares y marcado inicial global
 # for indice, subred in enumerate(lista_arboles_de_alcanzabilidad):
 #     completarNodo(subred["none"]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial)
 #     subred["none"]["completo"] = True
-# # # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
+# # print(lista_arboles_de_alcanzabilidad[0]["none"]["nodos"])
 
 interelacion_subredes = []
 
