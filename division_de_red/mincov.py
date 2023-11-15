@@ -71,3 +71,13 @@ def try_add_to_train_2i1o_1i2o(
 
 
 
+def join_tree(arbol_de_alcanzabilidad):
+    nodos = {}
+    conexiones = []
+    for subred_padre in arbol_de_alcanzabilidad:
+        for subred_hija in subred_padre:
+            if subred_padre[subred_hija]["completo"]:
+                print("COMPLETO: ", subred_padre[subred_hija]["nodos"])
+                nodos = nodos | subred_padre[subred_hija]["nodos"]
+                conexiones += subred_padre[subred_hija]["conexiones"]
+    return {"nodos" : nodos, "conexiones" : conexiones}
