@@ -1,5 +1,7 @@
 from typing import List
 from itertools import compress, product
+import re
+
 
 
 def set_to_string(items):
@@ -291,3 +293,41 @@ def generate_mincov_json_input(i, matriz, plazas_temp_con_mark, caminos_con_inic
         file["network"] = network
         f.write(json.dumps(file))
     return new_filename
+
+def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: bool, transiciones_de_caminos_con_inicio_fin_complejo_encontrados):
+    with open(f"salida/{s}") as salida:
+        salida_json = json.load(salida)
+        array_nodos = {}  # n1 = [0, 0, 1, 0] va a ser {1: [0, 0, 1, 0]}
+        array_conexiones = []  # n1 -> t5 -> n2 va a ser [1, 5, 2]
+        conexiones_agregadas = set()
+
+        for nodes in salida_json["nodes"]:
+            n = int(nodes["id"][1:])
+            if n != 1 or not is_none:
+                n += index_nodos
+            state = stateToList(nodes["state"])
+            array_nodos[n] = state
+
+        for conexiones in salida_json["edges"]:
+            n = conexiones["path"]
+            if n not in conexiones_agregadas:
+                conexiones_agregadas.add(n)
+                temp = []
+                nodo_from = int(conexiones["from"][1:])
+                if nodo_from != 1 or not is_none:
+                    nodo_from += index_nodos
+                nodo_to = int(conexiones["to"][1:])
+                if nodo_to != 1 or not is_none:
+                    nodo_to += index_nodos
+                temp.append(nodo_from)
+                temp.append(transiciones_de_caminos_con_inicio_fin_complejo_encontrados[numero_sub_red][int(re.search(r".*T(\d+)", n).groups()[0]) - 1])
+                temp.append(nodo_to)
+                array_conexiones.append(temp)
+        new_index_nodos = index_nodos + len(array_nodos) + 1
+        if is_none and len(array_nodos) == 1:
+            new_index_nodos -= 1
+        print("len", len(array_nodos))
+        print("new_index_nodos", new_index_nodos)
+        print("proximo", new_index_nodos + len(array_nodos))
+        return {"nodos": array_nodos, "conexiones": array_conexiones, "completo": False}, new_index_nodos - 1
+
