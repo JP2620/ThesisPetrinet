@@ -29,39 +29,45 @@ def clasificar_plazas(matriz_incidencia: List[List[int]]) -> List[List[int]]:
 
     return [plazas_simples, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada, plazas_complejas_total]
 
-# Example usage:
-# matriz_incidencia = [[...], [...], ...]
-# result = clasificar_plazas(matriz_incidencia)
-# print(result)
-
 
 def try_add_to_train_2i1o_1i2o(
-  t,
-  transiciones_plazas_dos_entradas_una_salida, 
-  dict_plazas_dos_entradas_una_salida, 
-  plazas_dos_entradas_una_salida, 
-  matriz_incidencia,
-  res_con_plazas_especiales, 
-  res_transiciones_usadas_con_plazas_especiales,
-  transiciones_plazas_dos_salidas_una_entrada,
-  dict_plazas_dos_salidas_una_entrada,
-  plazas_dos_salidas_una_entrada
-  ):
+    t,
+    res_con_plazas_especiales,
+    res_transiciones_usadas_con_plazas_especiales,
+    transiciones_plazas_dos_entradas_una_salida,
+    dict_plazas_dos_entradas_una_salida,
+    plazas_dos_entradas_una_salida,
+    transiciones_plazas_dos_salidas_una_entrada,
+    dict_plazas_dos_salidas_una_entrada,
+    plazas_dos_salidas_una_entrada,
+    transiciones_borde,
+    matriz_incidencia):
     if (t+1 in transiciones_plazas_dos_entradas_una_salida 
             and t+1 in dict_plazas_dos_entradas_una_salida
             and dict_plazas_dos_entradas_una_salida[t+1] in plazas_dos_entradas_una_salida
             and matriz_incidencia[dict_plazas_dos_entradas_una_salida[t+1] - 1][t] > 0): # Si es de entrada
         plaza_dos_entradas_una_salida = dict_plazas_dos_entradas_una_salida[t+1]
+        transiciones_borde.remove(t+1)
+        plaza_index = plazas_dos_entradas_una_salida.index(plaza_dos_entradas_una_salida)
+        plazas_dos_entradas_una_salida.pop(plaza_index)
         res_con_plazas_especiales.append(plaza_dos_entradas_una_salida)
         for tt in range(len(matriz_incidencia[0])):
-            if(  != t and matriz_incidencia[plaza_dos_entradas_una_salida - 1][tt] != 0):
+            if(tt != t and matriz_incidencia[plaza_dos_entradas_una_salida - 1][tt] != 0):
                 res_transiciones_usadas_con_plazas_especiales.add(tt+1)
+        del plaza_dos_entradas_una_salida
     if(t+1 in transiciones_plazas_dos_salidas_una_entrada
             and t+1 in dict_plazas_dos_salidas_una_entrada
             and dict_plazas_dos_salidas_una_entrada[t+1] in plazas_dos_salidas_una_entrada
             and matriz_incidencia[dict_plazas_dos_salidas_una_entrada[t+1]- 1][t] < 0):
         plaza_dos_salidas_una_entrada = dict_plazas_dos_salidas_una_entrada[t+1]
+        transiciones_borde.remove(t+1)
+        plaza_index = plazas_dos_salidas_una_entrada.index(plaza_dos_salidas_una_entrada)
+        plazas_dos_salidas_una_entrada.pop(plaza_index)
         res_con_plazas_especiales.append(plaza_dos_salidas_una_entrada)
         for tt in range(len(matriz_incidencia[0])):
             if(tt != t and matriz_incidencia[plaza_dos_salidas_una_entrada - 1][tt] != 0):
                 res_transiciones_usadas_con_plazas_especiales.add(tt+1)
+        del plaza_dos_salidas_una_entrada
+
+
+

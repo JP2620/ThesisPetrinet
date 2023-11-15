@@ -46,3 +46,5 @@ matriz_incidencia_*_*.json
 #images
 *.png
 *.dot
+
+division_de_red/__pycache__/*
