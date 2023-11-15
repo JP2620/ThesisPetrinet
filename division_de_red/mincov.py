@@ -183,3 +183,31 @@ def generate_mincov_json_filled2(arbol_de_alcanzabilidad):
             })
 
         f.write(json.dumps(file))
+
+def generate_mincov_json_filled(arbol_de_alcanzabilidad, red_id):
+    for key in arbol_de_alcanzabilidad:
+        # print(key, arbol_de_alcanzabilidad[key])
+        # print("\n--------------SOY UN SEPARADOR--------------\n")
+        new_filename = "./salida/mincov_filled_out_" + str(red_id) + "_" +str(key) + ".json"
+        with open(new_filename, "w") as f:
+            file = {}
+            file["network"] = "red_" + str(key)
+            file["nodes"] = []
+            file["edges"] = []
+            for key2 in arbol_de_alcanzabilidad[key]["nodos"]:
+                # print(key, key2)
+                # print(arbol_de_alcanzabilidad[key]["nodos"][key2])
+                # print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
+                file["nodes"].append({
+                        "id": "n" + str(key2),
+                        "state": list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]),
+                        "group": "root" if key2 == 1 else "not omega",
+                    })
+            for key3 in arbol_de_alcanzabilidad[key]["conexiones"]:
+                file["edges"].append({
+                    "from": "n" + str(key3[0]),
+                    "path": "n" + str(key3[0]) + " --(T" + str(key3[1]) + ")--> n" + str(key3[2]),
+                    "to": "n" + str(key3[2]),
+                })
+
+            f.write(json.dumps(file))
