@@ -1,4 +1,16 @@
 from typing import List
+from itertools import compress, product
+
+
+def set_to_string(items):
+    string_set = '-'.join(list([str(num) for num in items]))
+    return string_set
+
+def list_to_string(lista: List[int]) -> str:
+    return "[" + ", ".join([str(elem) for elem in lista]) + " ]"
+  
+def combinations(items):
+    return ( set(compress(items,mask)) for mask in product(*[[0,1]]*len(items)) )
 
 def clasificar_plazas(matriz_incidencia: List[List[int]]) -> List[List[int]]:
     plazas_simples = []
@@ -143,3 +155,31 @@ def generate_mincov_json_input_general(matriz, marcado_inicial) -> str:
         file["network"] = network
         f.write(json.dumps(file))
         return salida_filename
+
+
+def generate_mincov_json_filled2(arbol_de_alcanzabilidad):
+    # print(key, arbol_de_alcanzabilidad[key])
+    # print("\n--------------SOY UN SEPARADOR--------------\n")
+    new_filename = "./salida/mincov_filled_out_final.json"
+    with open(new_filename, "w") as f:
+        file = {}
+        file["network"] = "red_final"
+        file["nodes"] = []
+        file["edges"] = []
+        for key2 in arbol_de_alcanzabilidad["nodos"]:
+            # print(key, key2)
+            # print(arbol_de_alcanzabilidad[key]["nodos"][key2])
+            # print(list_to_string(arbol_de_alcanzabilidad[key]["nodos"][key2]))
+            file["nodes"].append({
+                    "id": "n" + str(key2),
+                    "state": list_to_string(arbol_de_alcanzabilidad["nodos"][key2]),
+                    "group": "root" if key2 == 1 else "not omega",
+                })
+        for key3 in arbol_de_alcanzabilidad["conexiones"]:
+            file["edges"].append({
+                "from": "n" + str(key3[0]),
+                "path": "n" + str(key3[0]) + " --(T" + str(key3[1]) + ")--> n" + str(key3[2]),
+                "to": "n" + str(key3[2]),
+            })
+
+        f.write(json.dumps(file))
