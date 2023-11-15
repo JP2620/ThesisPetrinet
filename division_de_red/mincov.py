@@ -81,3 +81,65 @@ def join_tree(arbol_de_alcanzabilidad):
                 nodos = nodos | subred_padre[subred_hija]["nodos"]
                 conexiones += subred_padre[subred_hija]["conexiones"]
     return {"nodos" : nodos, "conexiones" : conexiones}
+
+
+import json
+
+def generate_mincov_json_input_general(matriz, marcado_inicial) -> str:
+    salida_filename = "./salida/matriz_incidencia_.json"
+    with open(salida_filename, "w") as f:
+        file = {}
+        plazas = []
+        transiciones = []
+        arcos = []
+        for j, columna in enumerate(matriz[0]):
+            transicion = {
+                "index": j,
+                "type": "immediate",
+                "guard": True,
+                "event": True,
+            }
+            transiciones.append(transicion)
+        for j, fila in enumerate(matriz):
+            # Create json object
+            plaza = {
+                "index": j,
+                "type": "discrete",
+                "initial_marking": marcado_inicial[j],
+            }
+            plazas.append(plaza)
+            for k, columna in enumerate(fila):
+                if columna > 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": False,
+                        "source": k,
+                        "target": j,
+                        "weight": columna,
+                    }
+                    arcos.append(arco)
+                elif columna < 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": True,
+                        "source": j,
+                        "target": k,
+                        "weight": -columna,
+                    }
+                    arcos.append(arco)
+
+        file["places"] = plazas
+        file["transitions"] = transiciones
+        file["arcs"] = arcos
+
+        network = {
+            "id": "ejemplo",
+            "amount_places": len(plazas),
+            "amount_transitions": len(transiciones),
+            "time_scale": "millisecond",
+            "is_temporal": False,
+            "network_type": "discrete",
+        }
+        file["network"] = network
+        f.write(json.dumps(file))
+        return salida_filename
