@@ -211,3 +211,77 @@ def generate_mincov_json_filled(arbol_de_alcanzabilidad, red_id):
                 })
 
             f.write(json.dumps(file))
+
+def generate_mincov_json_input(i, matriz, plazas_temp_con_mark, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial) -> str:
+    new_filename = "./salida/matriz_incidencia_" + str(i) + "_" + set_to_string(plazas_temp_con_mark) + ".json"
+    with open(new_filename, "w") as f:
+        file = {}
+        plazas = []
+        transiciones = []
+        arcos = []
+        for j, columna in enumerate(matriz[0]):
+            transicion = {
+                "index": j,
+                "type": "immediate",
+                "guard": True,
+                "event": True,
+            }
+            transiciones.append(transicion)
+        for j, fila in enumerate(matriz):
+            # Create json object
+            plaza_a_verificar = caminos_con_inicio_fin_complejo_encontrados[i][j]
+            if plaza_a_verificar < 0:  # significa que es una aux
+                if plaza_a_verificar * -1 in plazas_temp_con_mark:
+                    plaza = {
+                        "index": j,
+                        "type": "discrete",
+                        "initial_marking": 1,
+                    }
+                else:
+                    plaza = {
+                        "index": j,
+                        "type": "discrete",
+                        "initial_marking": 0,
+                    }
+            else:
+                plaza = {
+                    "index": j,
+                    "type": "discrete",
+                    "initial_marking": marcado_inicial[caminos_con_inicio_fin_complejo_encontrados[i][j] - 1],
+                }
+            plazas.append(plaza)
+            for k, columna in enumerate(fila):
+                if columna > 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": False,
+                        "source": k,
+                        "target": j,
+                        "weight": columna,
+                    }
+                    arcos.append(arco)
+                elif columna < 0:
+                    arco = {
+                        "type": "regular",
+                        "from_place": True,
+                        "source": j,
+                        "target": k,
+                        "weight": -columna,
+                    }
+                    arcos.append(arco)
+
+        file["places"] = plazas
+        file["transitions"] = transiciones
+        file["arcs"] = arcos
+
+        network = {
+            "id": "ejemplo",
+            "amount_places": len(plazas),
+            "amount_transitions": len(transiciones),
+            "time_scale": "millisecond",
+            "is_temporal": False,
+            "network_type": "discrete",
+        }
+        file["network"] = network
+        f.write(json.dumps(file))
+    return new_filename
