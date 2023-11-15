@@ -12,6 +12,12 @@ def list_to_string(lista: List[int]) -> str:
 def combinations(items):
     return ( set(compress(items,mask)) for mask in product(*[[0,1]]*len(items)) )
 
+def stateToList(state: str) -> List[int]:
+    a = state.split(" ")[:-1]
+    a[0] = a[0][1:]
+    a = [int(x) for x in a]
+    return a
+
 def clasificar_plazas(matriz_incidencia: List[List[int]]) -> List[List[int]]:
     plazas_simples = []
     plazas_complejas = []
