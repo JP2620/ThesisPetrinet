@@ -1,6 +1,7 @@
 from typing import List
 from itertools import compress, product
 import re
+import copy
 
 
 
@@ -331,3 +332,105 @@ def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: b
         print("proximo", new_index_nodos + len(array_nodos))
         return {"nodos": array_nodos, "conexiones": array_conexiones, "completo": False}, new_index_nodos - 1
 
+def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_inicial, N_PLAZAS):
+    lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
+    for i in range(N_PLAZAS):
+        if i+1 in lista_orden_plazas_subred:
+            posicion = lista_orden_plazas_subred.index(i+1)
+            for nodos in lista_nodos_subred:
+                nodo = lista_nodos_subred[nodos]
+                nodo_cpy = lista_nodos_subred_cpy[nodos]
+                if i < len(nodo):
+                    nodo[i] = nodo_cpy[posicion]
+                else:
+                    nodo.append(nodo_cpy[posicion])
+        else:
+            for nodos in lista_nodos_subred:
+                nodo = lista_nodos_subred[nodos]
+                if i < len(nodo):
+                    nodo[i] = marcado_inicial[i]
+                else:
+                    nodo.append(marcado_inicial[i])
+    for nodo in lista_nodos_subred:
+        if lista_nodos_subred[nodo] == marcado_inicial:
+            return nodo
+    print("No encontré ningún cambio")
+    return -1  # También se podría devolver un booleano que indique que no se encontró nada
+
+def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado):
+    lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
+    lista_marcados_posibles = []
+    nodo_que_conecta = -1
+    for key, nodo in lista_nodos_subred.items():
+        conecta = True
+        for p in plaza_con_marcado_deseado:
+            if nodo[p] < 1:
+                conecta = False
+                break
+            else:
+                lista_nodos_subred_cpy[key][p] -= 1
+        if conecta:
+            nodo_que_conecta = key
+            lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
+    return lista_marcados_posibles, nodo_que_conecta
+
+def procesar_subred_relacionada(indice, matriz_relacion, lista_arboles_de_alcanzabilidad, matriz_incidencia_transpuesta, transiciones_borde, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial, N_PLAZAS):
+    for indice_mr, valor in enumerate(matriz_relacion[indice]):
+        if valor == 1:
+            for indice_red, red in enumerate(matriz_relacion):
+                if indice_red != indice and red[indice_mr] == 1:
+                    completar_subred(indice_red, lista_arboles_de_alcanzabilidad[indice_red], matriz_incidencia_transpuesta, matriz_relacion, lista_arboles_de_alcanzabilidad, transiciones_borde, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial, N_PLAZAS)
+                    break  # Detiene el bucle una vez que se completa la subred
+
+
+def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relacion, lista_arboles_de_alcanzabilidad, transiciones_borde, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial, N_PLAZAS):
+    completeuna = False
+    for plazas_aux in subred:
+        if subred[plazas_aux]["completo"] == False: 
+            if "none" in plazas_aux:
+                completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial, N_PLAZAS)
+                completeuna = True
+                subred["none"]["completo"] = True
+            else:
+                transicones_compartidas = []
+                if "-" in plazas_aux: 
+                    transiciones_compartidas_strings = plazas_aux.split("-")
+                    for transcion_compartida_string in transiciones_compartidas_strings:
+                        transicones_compartidas.append(int(transcion_compartida_string))
+                else:
+                    transicones_compartidas.append(int(plazas_aux)) 
+                
+                vector_plazas_necesarias = []
+                columnas_abuscar_matriz_relacion = []
+                for transicon_compartida in transicones_compartidas:
+                    for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
+                        if valor_plaza < 0:
+                            vector_plazas_necesarias.append(plaza)
+
+                    columnas_abuscar_matriz_relacion.append(transiciones_borde.index(transicon_compartida))
+                
+                for num_subred, fila in enumerate(matriz_relacion):
+                    sigo = True
+                    if num_subred != indice: 
+                        for columna_abuscar_matriz_relacion in columnas_abuscar_matriz_relacion:
+                            if fila[columna_abuscar_matriz_relacion] != 1:
+                                sigo = False
+                                break
+                        if sigo:
+                            for arbol in lista_arboles_de_alcanzabilidad[num_subred].values():
+                                if arbol["completo"]:
+                                    marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias)
+                                    if len(marcado_para_completar) > 0:
+                                        nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0], N_PLAZAS)
+                                        if nodo_propio != -1:
+                                            subred[plazas_aux]["completo"] = True
+                                            transicion_que_interconecta = []
+                                            transicion_que_interconecta.append(nodo_que_conecta) 
+                                            transicion_que_interconecta.append(int(plazas_aux))
+                                            transicion_que_interconecta.append(nodo_propio)
+                                            print("detecte la conexion: ", transicion_que_interconecta)
+                                            subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                                            completeuna = True
+                                            break 
+    if completeuna:
+        procesar_subred_relacionada(indice, matriz_relacion, lista_arboles_de_alcanzabilidad, matriz_incidencia_transpuesta, transiciones_borde, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial, N_PLAZAS)
