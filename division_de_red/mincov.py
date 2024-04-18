@@ -50,6 +50,37 @@ def clasificar_plazas(matriz_incidencia: List[List[int]]) -> List[List[int]]:
 
     return [plazas_simples, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada, plazas_complejas_total]
 
+def clasificar_transiciones(matriz_incidencia, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada):
+    transiciones_indeseadas = set()
+    transiciones_indeseadas_totales = set()
+    transiciones_plazas_dos_entradas_una_salida = []
+    transiciones_plazas_dos_salidas_una_entrada = []
+    dict_plazas_dos_entradas_una_salida = {}
+    dict_plazas_dos_salidas_una_entrada = {}
+
+    for j in range(len(matriz_incidencia[0])):
+        for i in plazas_complejas:
+            if matriz_incidencia[i - 1][j] != 0:
+                transiciones_indeseadas.add(j + 1)
+                transiciones_indeseadas_totales.add(j + 1)
+
+        for i in plazas_dos_entradas_una_salida:
+            if matriz_incidencia[i - 1][j] != 0:
+                transiciones_indeseadas_totales.add(j + 1)
+                transiciones_plazas_dos_entradas_una_salida.append(j + 1)
+                dict_plazas_dos_entradas_una_salida[j + 1] = i
+
+        for i in plazas_dos_salidas_una_entrada:
+            if matriz_incidencia[i - 1][j] != 0:
+                transiciones_indeseadas_totales.add(j + 1)
+                transiciones_plazas_dos_salidas_una_entrada.append(j + 1)
+                dict_plazas_dos_salidas_una_entrada[j + 1] = i
+
+    return transiciones_indeseadas, transiciones_indeseadas_totales, \
+        transiciones_plazas_dos_entradas_una_salida, \
+        transiciones_plazas_dos_salidas_una_entrada, \
+        dict_plazas_dos_entradas_una_salida, \
+        dict_plazas_dos_salidas_una_entrada
 
 def try_add_to_train_2i1o_1i2o(
     t,
