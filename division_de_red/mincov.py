@@ -357,18 +357,22 @@ def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_inicia
     print("No encontré ningún cambio")
     return -1  # También se podría devolver un booleano que indique que no se encontró nada
 
-def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado):
+def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado_propias, plaza_con_marcado_deseado_no_propias):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     lista_marcados_posibles = []
     nodo_que_conecta = -1
     for key, nodo in lista_nodos_subred.items():
         conecta = True
-        for p in plaza_con_marcado_deseado:
+        for p in plaza_con_marcado_deseado_propias:
+            if nodo[p] < 1:
+                conecta = False
+                break
+        for p in plaza_con_marcado_deseado_no_propias:
             if nodo[p] < 1:
                 conecta = False
                 break
             else:
-                lista_nodos_subred_cpy[key][p] -= 0 # TODO REVISAR PORQUE VA traer probblemas con el relleno
+                lista_nodos_subred_cpy[key][p] -= 1
         if conecta:
             nodo_que_conecta = key
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
@@ -385,9 +389,6 @@ def procesar_subred_relacionada(indice, matriz_relacion, lista_arboles_de_alcanz
 
 def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relacion, lista_arboles_de_alcanzabilidad, transiciones_borde, caminos_con_inicio_fin_complejo_encontrados, marcado_inicial, N_PLAZAS):
     completeuna = False
-    
-    print("Entrando a completar el indice:", indice)
-    print("La subred es:", subred)
     for plazas_aux in subred:
         if subred[plazas_aux]["completo"] == False: 
             if "none" in plazas_aux:
@@ -403,17 +404,19 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
                 else:
                     transicones_compartidas.append(int(plazas_aux)) 
                 
-                vector_plazas_necesarias = []
+                vector_plazas_necesarias_propias = [] #de la red a completar
+                vector_plazas_necesarias_no_propias = []
                 columnas_abuscar_matriz_relacion = []
-                print("La transicion compartida es la: ", transicones_compartidas)
                 for transicon_compartida in transicones_compartidas:
                     for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
                         if valor_plaza < 0:
-                            vector_plazas_necesarias.append(plaza)
+                            if plaza+1 in caminos_con_inicio_fin_complejo_encontrados[indice]:
+                                vector_plazas_necesarias_propias.append(plaza)
+                            else:
+                                vector_plazas_necesarias_no_propias.append(plaza)
 
                     columnas_abuscar_matriz_relacion.append(transiciones_borde.index(transicon_compartida))
-                print("vector_plazas_necesarias es", vector_plazas_necesarias)
-                print("columnas_abuscar_matriz_relacion es", columnas_abuscar_matriz_relacion)
+                
                 for num_subred, fila in enumerate(matriz_relacion):
                     sigo = True
                     for columna_abuscar_matriz_relacion in columnas_abuscar_matriz_relacion:
@@ -423,7 +426,7 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
                     if sigo:
                         for arbol in lista_arboles_de_alcanzabilidad[num_subred].values():
                             if arbol["completo"]:
-                                marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias)
+                                marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias_propias, vector_plazas_necesarias_no_propias)
                                 if len(marcado_para_completar) > 0:
                                     nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0], N_PLAZAS)
                                     if nodo_propio != -1:
