@@ -50,37 +50,6 @@ def clasificar_plazas(matriz_incidencia: List[List[int]]) -> List[List[int]]:
 
     return [plazas_simples, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada, plazas_complejas_total]
 
-def clasificar_transiciones(matriz_incidencia, plazas_complejas, plazas_dos_entradas_una_salida, plazas_dos_salidas_una_entrada):
-    transiciones_indeseadas = set()
-    transiciones_indeseadas_totales = set()
-    transiciones_plazas_dos_entradas_una_salida = []
-    transiciones_plazas_dos_salidas_una_entrada = []
-    dict_plazas_dos_entradas_una_salida = {}
-    dict_plazas_dos_salidas_una_entrada = {}
-
-    for j in range(len(matriz_incidencia[0])):
-        for i in plazas_complejas:
-            if matriz_incidencia[i - 1][j] != 0:
-                transiciones_indeseadas.add(j + 1)
-                transiciones_indeseadas_totales.add(j + 1)
-
-        for i in plazas_dos_entradas_una_salida:
-            if matriz_incidencia[i - 1][j] != 0:
-                transiciones_indeseadas_totales.add(j + 1)
-                transiciones_plazas_dos_entradas_una_salida.append(j + 1)
-                dict_plazas_dos_entradas_una_salida[j + 1] = i
-
-        for i in plazas_dos_salidas_una_entrada:
-            if matriz_incidencia[i - 1][j] != 0:
-                transiciones_indeseadas_totales.add(j + 1)
-                transiciones_plazas_dos_salidas_una_entrada.append(j + 1)
-                dict_plazas_dos_salidas_una_entrada[j + 1] = i
-
-    return transiciones_indeseadas, transiciones_indeseadas_totales, \
-        transiciones_plazas_dos_entradas_una_salida, \
-        transiciones_plazas_dos_salidas_una_entrada, \
-        dict_plazas_dos_entradas_una_salida, \
-        dict_plazas_dos_salidas_una_entrada
 
 def try_add_to_train_2i1o_1i2o(
     t,
@@ -363,7 +332,7 @@ def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: b
         print("proximo", new_index_nodos + len(array_nodos))
         return {"nodos": array_nodos, "conexiones": array_conexiones, "completo": False}, new_index_nodos - 1
 
-def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, key_marcado_inicial, marcado_inicial, N_PLAZAS, plaza_con_marcado_deseado):
+def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_inicial, N_PLAZAS):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     for i in range(N_PLAZAS):
         if i+1 in lista_orden_plazas_subred:
@@ -382,10 +351,6 @@ def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, key_marcado_in
                     nodo[i] = marcado_inicial[i]
                 else:
                     nodo.append(marcado_inicial[i])
-
-    for p in plaza_con_marcado_deseado: #TODO: Revisar porque esta mal
-        marcado_inicial[p] += 1
-
     for nodo in lista_nodos_subred:
         if lista_nodos_subred[nodo] == marcado_inicial:
             if key_marcado_inicial != None:
@@ -394,18 +359,22 @@ def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, key_marcado_in
     print("No encontré ningún cambio")
     return -1  # También se podría devolver un booleano que indique que no se encontró nada
 
-def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado):
+def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado_propias, plaza_con_marcado_deseado_no_propias):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     lista_marcados_posibles = []
     nodo_que_conecta = -1
     for key, nodo in lista_nodos_subred.items():
         conecta = True
-        for p in plaza_con_marcado_deseado:
+        for p in plaza_con_marcado_deseado_propias:
+            if nodo[p] < 1:
+                conecta = False
+                break
+        for p in plaza_con_marcado_deseado_no_propias:
             if nodo[p] < 1:
                 conecta = False
                 break
             else:
-                lista_nodos_subred_cpy[key][p] -= 1 # TODO REVISAR PORQUE VA traer probblemas con el relleno
+                lista_nodos_subred_cpy[key][p] -= 1
         if conecta:
             nodo_que_conecta = key # TODO: Guarda el ultimo cuando deberia guardar el primero o todos
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
@@ -425,7 +394,7 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
     for plazas_aux in subred:
         if subred[plazas_aux]["completo"] == False: 
             if "none" in plazas_aux:
-                completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], None, marcado_inicial, N_PLAZAS, [])
+                completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial, N_PLAZAS)
                 completeuna = True
                 subred["none"]["completo"] = True
             else:
@@ -437,18 +406,16 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
                 else:
                     transicones_compartidas.append(int(plazas_aux)) 
                 
-                vector_plazas_necesarias = []
-                vector_plazas_necesarias_proias = []
+                vector_plazas_necesarias_propias = [] #de la red a completar
+                vector_plazas_necesarias_no_propias = []
                 columnas_abuscar_matriz_relacion = []
                 for transicon_compartida in transicones_compartidas:
                     for plaza, valor_plaza in enumerate(matriz_incidencia_transpuesta[transicon_compartida-1]):
-                        # if valor_plaza < 0 and not (plaza+1 in caminos_con_inicio_fin_complejo_encontrados[indice]):
                         if valor_plaza < 0:
-                            if not (plaza+1 in caminos_con_inicio_fin_complejo_encontrados[indice]): #TODO: Revisar porque esta mal
-                                vector_plazas_necesarias.append(plaza)
+                            if plaza+1 in caminos_con_inicio_fin_complejo_encontrados[indice]:
+                                vector_plazas_necesarias_propias.append(plaza)
                             else:
-                                vector_plazas_necesarias.append(plaza)
-                                vector_plazas_necesarias_proias.append(plaza)
+                                vector_plazas_necesarias_no_propias.append(plaza)
 
                     columnas_abuscar_matriz_relacion.append(transiciones_borde.index(transicon_compartida))
                 
@@ -461,9 +428,9 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
                     if sigo:
                         for arbol in lista_arboles_de_alcanzabilidad[num_subred].values():
                             if arbol["completo"]:
-                                marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias)
+                                marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias_propias, vector_plazas_necesarias_no_propias)
                                 if len(marcado_para_completar) > 0:
-                                    nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], -1, marcado_para_completar[0], N_PLAZAS, vector_plazas_necesarias_proias)
+                                    nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0], N_PLAZAS)
                                     if nodo_propio != -1:
                                         subred[plazas_aux]["completo"] = True
                                         nuevas_conexiones = []
