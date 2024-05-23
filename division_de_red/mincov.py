@@ -363,7 +363,7 @@ def getArbolFromSalida(s: str, numero_sub_red: int, index_nodos: int, is_none: b
         print("proximo", new_index_nodos + len(array_nodos))
         return {"nodos": array_nodos, "conexiones": array_conexiones, "completo": False}, new_index_nodos - 1
 
-def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_inicial, N_PLAZAS, plaza_con_marcado_deseado):
+def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, key_marcado_inicial, marcado_inicial, N_PLAZAS, plaza_con_marcado_deseado):
     lista_nodos_subred_cpy = copy.deepcopy(lista_nodos_subred)
     for i in range(N_PLAZAS):
         if i+1 in lista_orden_plazas_subred:
@@ -388,6 +388,8 @@ def completar_nodo(lista_nodos_subred, lista_orden_plazas_subred, marcado_inicia
 
     for nodo in lista_nodos_subred:
         if lista_nodos_subred[nodo] == marcado_inicial:
+            if key_marcado_inicial != None:
+                nodo_encontrado = lista_nodos_subred.pop(nodo)
             return nodo
     print("No encontré ningún cambio")
     return -1  # También se podría devolver un booleano que indique que no se encontró nada
@@ -405,7 +407,7 @@ def buscar_marcado_deseado(lista_nodos_subred, plaza_con_marcado_deseado):
             else:
                 lista_nodos_subred_cpy[key][p] -= 1 # TODO REVISAR PORQUE VA traer probblemas con el relleno
         if conecta:
-            nodo_que_conecta = key
+            nodo_que_conecta = key # TODO: Guarda el ultimo cuando deberia guardar el primero o todos
             lista_marcados_posibles.append(lista_nodos_subred_cpy[key])
     return lista_marcados_posibles, nodo_que_conecta
 
@@ -423,7 +425,7 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
     for plazas_aux in subred:
         if subred[plazas_aux]["completo"] == False: 
             if "none" in plazas_aux:
-                completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_inicial, N_PLAZAS, [])
+                completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], None, marcado_inicial, N_PLAZAS, [])
                 completeuna = True
                 subred["none"]["completo"] = True
             else:
@@ -461,15 +463,18 @@ def completar_subred(indice, subred, matriz_incidencia_transpuesta, matriz_relac
                             if arbol["completo"]:
                                 marcado_para_completar, nodo_que_conecta = buscar_marcado_deseado(arbol["nodos"], vector_plazas_necesarias)
                                 if len(marcado_para_completar) > 0:
-                                    nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], marcado_para_completar[0], N_PLAZAS, vector_plazas_necesarias_proias)
+                                    nodo_propio = completar_nodo(subred[plazas_aux]["nodos"], caminos_con_inicio_fin_complejo_encontrados[indice], -1, marcado_para_completar[0], N_PLAZAS, vector_plazas_necesarias_proias)
                                     if nodo_propio != -1:
                                         subred[plazas_aux]["completo"] = True
-                                        transicion_que_interconecta = []
-                                        transicion_que_interconecta.append(nodo_que_conecta) 
-                                        transicion_que_interconecta.append(int(plazas_aux))
-                                        transicion_que_interconecta.append(nodo_propio)
-                                        print("detecte la conexion: ", transicion_que_interconecta)
-                                        subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
+                                        nuevas_conexiones = []
+                                        for conexiones in subred[plazas_aux]["conexiones"]:
+                                            if conexiones[0] == nodo_propio:
+                                                conexiones[0] = nodo_que_conecta
+                                            if conexiones[2] != nodo_propio:
+                                                nuevas_conexiones.append(conexiones) ##TODO: Nose si simplemente deberiamos eliminar los que se conectan al nodo que borramos. Seguro falta mas logica
+
+                                        subred[plazas_aux]["conexiones"] = nuevas_conexiones
+                                        #subred[plazas_aux]["conexiones"].append(transicion_que_interconecta)
                                         completeuna = True
                                         break 
     if completeuna:
